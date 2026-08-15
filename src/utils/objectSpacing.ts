@@ -1,4 +1,4 @@
-import { isOpening, type Wall, type WallObject } from '@/types/plan'
+import { isDimensioned, isOpening, type Wall, type WallObject } from '@/types/plan'
 import { round } from '@/utils/geometry'
 
 /**
@@ -42,11 +42,15 @@ export function objectExtent(object: WallObject): Extent {
  * End of the object sitting in front of `start`, or `0` for the wall start when
  * there is none. `ignoreId` keeps the object that is being edited from becoming
  * its own predecessor.
+ *
+ * Objects excluded from the dimension are skipped: the field is meant to show
+ * the very figure printed in the detail row, and an object that does not appear
+ * there must not become the reference point either.
  */
 export function previousEnd(wall: Wall, start: number, ignoreId?: string): number {
   let previous: Extent | null = null
   for (const object of wall.objects) {
-    if (object.id === ignoreId) continue
+    if (object.id === ignoreId || !isDimensioned(object)) continue
     const extent = objectExtent(object)
     if (extent.start >= start - EPSILON) continue
     if (!previous || extent.start > previous.start) previous = extent

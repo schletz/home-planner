@@ -18,8 +18,22 @@ export const DIM_DETAIL_DISTANCE = 40
 /** Distance of the overall dimension row from the wall face, in cm. */
 export const DIM_TOTAL_DISTANCE = 85
 
+/**
+ * Distance of the two dimension lines of a shaft from its own edges, in cm.
+ * A shaft is measured on its own because its depth points away from the wall
+ * and can therefore never appear in a row running along the wall.
+ */
+export const DIM_SHAFT_DISTANCE = 18
+
 /** Height of the dimension figures in cm. */
 export const DIM_TEXT_SIZE = 16
+
+/**
+ * Space a dimension row needs beyond its line, in cm. The figure sits 0.85 of
+ * its size above the line and is centred there, so its outer edge is one and a
+ * third sizes away. Anything drawn behind a row has to keep this distance.
+ */
+export const DIM_ROW_HEIGHT = DIM_TEXT_SIZE * 1.35
 
 /** Half length of the slanted tick at a dimension point, in cm. */
 export const DIM_TICK = 7

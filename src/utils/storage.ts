@@ -53,6 +53,9 @@ function parseObject(raw: unknown): WallObject | null {
   if (typeof raw !== 'object' || raw === null) return null
   const source = raw as Record<string, unknown>
   const kind = typeof source.kind === 'string' ? source.kind : ''
+  // Only an explicit `false` counts, so files without the flag keep every
+  // object in the dimension row.
+  const excluded = source.includeInDimension === false
 
   if ((OPENING_KINDS as string[]).includes(kind)) {
     const opening: Opening = {
@@ -63,6 +66,7 @@ function parseObject(raw: unknown): WallObject | null {
       frame: num(source.frame, 6),
       swing: oneOf(source.swing, SWING_DIRECTIONS, 'start-above'),
     }
+    if (excluded) opening.includeInDimension = false
     if (typeof source.text === 'string' && source.text) opening.text = source.text
     return opening
   }
@@ -77,6 +81,7 @@ function parseObject(raw: unknown): WallObject | null {
     }
     if (typeof source.length === 'number') installation.length = num(source.length, 100)
     if (typeof source.depth === 'number') installation.depth = num(source.depth, 40)
+    if (excluded) installation.includeInDimension = false
     if (typeof source.text === 'string' && source.text) installation.text = source.text
     return installation
   }
@@ -97,6 +102,8 @@ function parseWall(raw: unknown): Wall | null {
     thickness: Math.max(num(source.thickness, 25), 1),
     totalDimension: parseDimensionOffset(source.totalDimension, -DIM_TOTAL_DISTANCE),
     detailDimension: parseDimensionOffset(source.detailDimension, -DIM_DETAIL_DISTANCE),
+    dimensionMarginStart: num(source.dimensionMarginStart, 0),
+    dimensionMarginEnd: num(source.dimensionMarginEnd, 0),
     objects: Array.isArray(source.objects)
       ? source.objects.map(parseObject).filter((object): object is WallObject => object !== null)
       : [],

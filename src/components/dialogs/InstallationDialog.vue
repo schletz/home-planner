@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
+import CheckField from '@/components/form/CheckField.vue'
 import NumberField from '@/components/form/NumberField.vue'
 import ObjectOffsetFields from '@/components/form/ObjectOffsetFields.vue'
 import OptionGroup from '@/components/form/OptionGroup.vue'
@@ -36,6 +37,7 @@ const draft = reactive({
   length: defaults.installation[props.kind].length,
   depth: defaults.installation[props.kind].depth,
   side: defaults.installation[props.kind].side,
+  includeInDimension: defaults.installation[props.kind].includeInDimension,
   text: '',
 })
 
@@ -52,6 +54,11 @@ const hasHeight = computed(() => !isShaft.value)
 const lengthLabel = computed(() => (isShaft.value ? 'Breite' : 'Länge'))
 /** Objects with an extent are placed by their centre, openings by their edge. */
 const leading = computed(() => (hasLength.value ? draft.length / 2 : 0))
+const dimensionHint = computed(() =>
+  isShaft.value
+    ? 'Der Schacht wird immer selbst bemaßt; die Option steuert nur den Eintrag in der Wandbemaßung.'
+    : 'Ausschalten, wenn ein anderes Objekt an derselben Stelle sitzt.',
+)
 
 function confirm(): void {
   const installation: Installation = {
@@ -63,6 +70,8 @@ function confirm(): void {
   }
   if (hasLength.value) installation.length = Math.max(draft.length, 10)
   if (isShaft.value) installation.depth = Math.max(draft.depth, 1)
+  // A missing flag means "measured", so only the exception is written out.
+  if (!draft.includeInDimension) installation.includeInDimension = false
   const text = draft.text.trim()
   if (text) installation.text = text
 
@@ -71,6 +80,7 @@ function confirm(): void {
     length: installation.length ?? defaults.installation[props.kind].length,
     depth: installation.depth ?? defaults.installation[props.kind].depth,
     side: installation.side,
+    includeInDimension: draft.includeInDimension,
   })
   emit('confirm', installation)
 }
@@ -85,6 +95,11 @@ function confirm(): void {
       <NumberField v-if="isShaft" v-model="draft.depth" label="Tiefe" :min="1" />
     </div>
     <OptionGroup v-model="draft.side" label="Wandseite" :options="SIDES" />
+    <CheckField
+      v-model="draft.includeInDimension"
+      label="In Bemaßung berücksichtigen"
+      :hint="dimensionHint"
+    />
     <TextField v-model="draft.text" label="Text (optional)" placeholder="z. B. Waschmaschine" />
   </BaseDialog>
 </template>

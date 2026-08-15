@@ -78,6 +78,27 @@ function set(patch: Partial<Omit<Wall, 'id' | 'objects'>>): void {
       Bemaßung aus.
     </p>
 
+    <div class="grid">
+      <NumberField
+        :model-value="wall.dimensionMarginStart"
+        label="Bemaßungsrand links"
+        :step="5"
+        @update:model-value="set({ dimensionMarginStart: $event })"
+        @commit="store.commit()"
+      />
+      <NumberField
+        :model-value="wall.dimensionMarginEnd"
+        label="Bemaßungsrand rechts"
+        :step="5"
+        @update:model-value="set({ dimensionMarginEnd: $event })"
+        @commit="store.commit()"
+      />
+    </div>
+    <p class="hint">
+      Rückt die äußeren Maßstriche nach innen, etwa um die halbe Stärke der anschließenden Wand.
+      Links ist der Wandanfang. Die Maßzahlen bleiben unverändert.
+    </p>
+
     <div v-if="wall.objects.length" class="objects">
       <span class="objects-title">Objekte in dieser Wand</span>
       <button

@@ -53,12 +53,16 @@ Laufrichtung der Wand.
       "length": 600, "angle": 0, "thickness": 30,
       "totalDimension": -85,          // cm ab Wandaußenkante, siehe unten
       "detailDimension": -40,
+      "dimensionMarginStart": 15,     // rückt nur die äußeren Maßstriche ein
+      "dimensionMarginEnd": 15,
       "objects": [
         { "id": "obj-1", "kind": "window", "offset": 120, "width": 140,
           "frame": 8, "swing": "start-above", "text": "Küche" },
         { "id": "obj-2", "kind": "socket", "offset": 320, "height": 30,
           "side": "above" },
-        { "id": "obj-3", "kind": "shaft", "offset": 480, "height": 0,
+        { "id": "obj-3", "kind": "radiator", "offset": 190, "height": 20,
+          "length": 100, "side": "above", "includeInDimension": false },
+        { "id": "obj-4", "kind": "shaft", "offset": 480, "height": 0,
           "length": 60, "depth": 40, "side": "below" }
       ]
     }
@@ -69,12 +73,27 @@ Laufrichtung der Wand.
 `kind` ist `door`, `window`, `doubleWindow`, `socket`, `water`, `radiator` oder
 `shaft`. `swing` beschreibt den Anschlag (`start`/`end`) und die Öffnungsseite
 (`above`/`below`); beim Doppelfenster zählt nur die Seite. Ein `shaft` ist ein
-Schacht, der mit `length` entlang der Wand und `depth` in den Raum hinein misst.
+Schacht, der mit `length` entlang der Wand und `depth` in den Raum hinein misst;
+er bringt eine eigene Bemaßung für Breite und Tiefe mit, weil seine Tiefe in
+keiner Maßreihe entlang der Wand vorkommen kann.
 
 `totalDimension` und `detailDimension` sind der Abstand der jeweiligen Maßlinie
 von der Wandaußenkante in cm: negativ liegt sie auf der `above`-Seite, positiv
 auf der `below`-Seite, `0` blendet die Reihe aus. Ältere Dateien mit `above`,
 `below` oder `none` werden beim Laden umgerechnet.
+
+`dimensionMarginStart` und `dimensionMarginEnd` verschieben nur den ersten und
+den letzten Maßstrich nach innen — üblicherweise um die halbe Stärke der
+anschließenden Wand, weil im Rauminneren gemessen wird, die Wand aber als
+Mittellinie gespeichert ist. *Links* ist der Wandanfang. An den Maßzahlen ändert
+sich dabei nichts: eine Wand mit `length: 616` zeigt immer 616. Fehlt die
+Angabe, ist der Rand 0.
+
+`includeInDimension` steuert, ob ein Objekt in der Detailbemaßung der Wand
+auftaucht. Fehlt die Angabe, gilt `true`. Ausschalten lohnt sich, wenn zwei
+Objekte übereinander liegen — ein Heizkörper unter einem Fenster würde die
+Maßkette sonst doppelt beschriften. Beim Schacht steuert die Option nur den
+Eintrag in der Wandbemaßung; seine eigenen Maßpfeile bleiben in jedem Fall.
 
 ### Objekte positionieren
 
@@ -83,7 +102,12 @@ steht daneben der *Abstand zum vorigen Objekt* — die lichte Weite bis zur
 Hinterkante des Objekts davor, also genau die Zahl, die in der Detailbemaßung
 zwischen den beiden steht. Beide Felder beschreiben dieselbe Lage; wer das eine
 ändert, bekommt das andere neu gerechnet. Gibt es kein voriges Objekt, wird ab
-Wandanfang gemessen.
+Wandanfang gemessen. Objekte ohne Bemaßung werden dabei übersprungen.
+
+Beide Felder nehmen auch Rechnungen an: `214+7`, `142/2+1` oder `(80+120)/2`
+sind gültige Eingaben. Erlaubt sind `+`, `-`, `*`, `/` und Klammern, Punkt vor
+Strich; Dezimaltrennzeichen ist der Punkt. Beim Verlassen des Feldes steht dort
+das Ergebnis.
 
 ## SVG-Export
 

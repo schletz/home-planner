@@ -25,6 +25,8 @@ const draft = reactive({
   thickness: defaults.wall.thickness,
   totalDimension: defaults.wall.totalDimension,
   detailDimension: defaults.wall.detailDimension,
+  dimensionMarginStart: defaults.wall.dimensionMarginStart,
+  dimensionMarginEnd: defaults.wall.dimensionMarginEnd,
 })
 
 const QUICK_ANGLES = [0, 90, 180, 270]
@@ -38,6 +40,8 @@ function confirm(): void {
     thickness: Math.max(draft.thickness, 1),
     totalDimension: draft.totalDimension,
     detailDimension: draft.detailDimension,
+    dimensionMarginStart: draft.dimensionMarginStart,
+    dimensionMarginEnd: draft.dimensionMarginEnd,
   }
   Object.assign(defaults.wall, {
     length: wall.length,
@@ -45,6 +49,8 @@ function confirm(): void {
     thickness: wall.thickness,
     totalDimension: wall.totalDimension,
     detailDimension: wall.detailDimension,
+    dimensionMarginStart: wall.dimensionMarginStart,
+    dimensionMarginEnd: wall.dimensionMarginEnd,
   })
   emit('confirm', wall)
 }
@@ -85,6 +91,15 @@ function confirm(): void {
     <p class="hint">
       Abstand der Maßlinie von der Wand. Negativ liegt darüber, positiv darunter, 0 blendet die
       Bemaßung aus.
+    </p>
+
+    <div class="grid">
+      <NumberField v-model="draft.dimensionMarginStart" label="Bemaßungsrand links" :step="5" />
+      <NumberField v-model="draft.dimensionMarginEnd" label="Bemaßungsrand rechts" :step="5" />
+    </div>
+    <p class="hint">
+      Rückt die äußeren Maßstriche nach innen, etwa um die halbe Stärke der anschließenden Wand.
+      Links ist der Wandanfang. Die Maßzahlen bleiben unverändert.
     </p>
   </BaseDialog>
 </template>

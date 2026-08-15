@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
+import CheckField from '@/components/form/CheckField.vue'
 import NumberField from '@/components/form/NumberField.vue'
 import ObjectOffsetFields from '@/components/form/ObjectOffsetFields.vue'
 import OptionGroup from '@/components/form/OptionGroup.vue'
@@ -29,6 +30,7 @@ const draft = reactive({
   width: defaults.opening[props.kind].width,
   frame: defaults.opening[props.kind].frame,
   swing: defaults.opening[props.kind].swing,
+  includeInDimension: defaults.opening[props.kind].includeInDimension,
   text: '',
 })
 
@@ -58,6 +60,8 @@ function confirm(): void {
     frame: clamp(draft.frame, 0, width / 2 - 0.5),
     swing: draft.swing,
   }
+  // A missing flag means "measured", so only the exception is written out.
+  if (!draft.includeInDimension) opening.includeInDimension = false
   const text = draft.text.trim()
   if (text) opening.text = text
 
@@ -65,6 +69,7 @@ function confirm(): void {
     width: opening.width,
     frame: opening.frame,
     swing: opening.swing,
+    includeInDimension: draft.includeInDimension,
   })
   emit('confirm', opening)
 }
@@ -79,6 +84,11 @@ function confirm(): void {
     </div>
     <OptionGroup v-model="draft.swing" label="Öffnungsrichtung" :options="SWINGS" />
     <p v-if="swingHint" class="hint">{{ swingHint }}</p>
+    <CheckField
+      v-model="draft.includeInDimension"
+      label="In Bemaßung berücksichtigen"
+      hint="Ausschalten, wenn ein anderes Objekt an derselben Stelle sitzt."
+    />
     <TextField v-model="draft.text" label="Text (optional)" placeholder="z. B. Bad" />
   </BaseDialog>
 </template>

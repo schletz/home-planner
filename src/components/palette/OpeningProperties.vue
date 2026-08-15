@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import CheckField from '@/components/form/CheckField.vue'
 import NumberField from '@/components/form/NumberField.vue'
 import ObjectOffsetFields from '@/components/form/ObjectOffsetFields.vue'
 import OptionGroup from '@/components/form/OptionGroup.vue'
 import TextField from '@/components/form/TextField.vue'
 import { usePlanStore } from '@/composables/usePlanStore'
-import type { Opening, SwingDirection, Wall } from '@/types/plan'
+import { isDimensioned, type Opening, type SwingDirection, type Wall } from '@/types/plan'
 
 /** Properties of the selected door, window or double window. */
 const props = defineProps<{ wall: Wall; opening: Opening }>()
@@ -53,6 +54,13 @@ function set(patch: Partial<Opening>): void {
       label="Öffnungsrichtung"
       :options="SWINGS"
       @update:model-value="set({ swing: $event })"
+      @commit="store.commit()"
+    />
+    <CheckField
+      :model-value="isDimensioned(opening)"
+      label="In Bemaßung berücksichtigen"
+      hint="Ausschalten, wenn ein anderes Objekt an derselben Stelle sitzt."
+      @update:model-value="set({ includeInDimension: $event })"
       @commit="store.commit()"
     />
     <TextField

@@ -21,11 +21,22 @@ export interface PlannerDefaults {
     angle: number
     totalDimension: DimensionOffset
     detailDimension: DimensionOffset
+    dimensionMarginStart: number
+    dimensionMarginEnd: number
   }
-  opening: Record<OpeningKind, { width: number; frame: number; swing: SwingDirection }>
+  opening: Record<
+    OpeningKind,
+    { width: number; frame: number; swing: SwingDirection; includeInDimension: boolean }
+  >
   installation: Record<
     InstallationKind,
-    { height: number; length: number; depth: number; side: WallSide }
+    {
+      height: number
+      length: number
+      depth: number
+      side: WallSide
+      includeInDimension: boolean
+    }
   >
 }
 
@@ -39,17 +50,19 @@ function createDefaults(): PlannerDefaults {
       angle: 0,
       totalDimension: -DIM_TOTAL_DISTANCE,
       detailDimension: -DIM_DETAIL_DISTANCE,
+      dimensionMarginStart: 0,
+      dimensionMarginEnd: 0,
     },
     opening: {
-      door: { width: 90, frame: 6, swing: 'start-above' },
-      window: { width: 120, frame: 8, swing: 'start-above' },
-      doubleWindow: { width: 240, frame: 8, swing: 'start-above' },
+      door: { width: 90, frame: 6, swing: 'start-above', includeInDimension: true },
+      window: { width: 120, frame: 8, swing: 'start-above', includeInDimension: true },
+      doubleWindow: { width: 240, frame: 8, swing: 'start-above', includeInDimension: true },
     },
     installation: {
-      socket: { height: 30, length: 0, depth: 0, side: 'above' },
-      water: { height: 60, length: 0, depth: 0, side: 'above' },
-      radiator: { height: 20, length: 100, depth: 0, side: 'above' },
-      shaft: { height: 0, length: 60, depth: 40, side: 'above' },
+      socket: { height: 30, length: 0, depth: 0, side: 'above', includeInDimension: true },
+      water: { height: 60, length: 0, depth: 0, side: 'above', includeInDimension: true },
+      radiator: { height: 20, length: 100, depth: 0, side: 'above', includeInDimension: true },
+      shaft: { height: 0, length: 60, depth: 40, side: 'above', includeInDimension: true },
     },
   }
 }

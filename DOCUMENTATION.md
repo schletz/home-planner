@@ -29,40 +29,43 @@ Zeilenzahlen inklusive `<template>` und `<style>` der SFCs.
 | [src/components/plan/WallBody.vue](src/components/plan/WallBody.vue) | 51 | Körpersegmente einer Wand, je Durchgang als Kontur oder als Füllung |
 | [src/components/plan/WallShape.vue](src/components/plan/WallShape.vue) | 82 | Alles über dem Wandkörper: Klickfläche, Objekte, zwei Bemaßungsreihen |
 | [src/components/plan/OpeningShape.vue](src/components/plan/OpeningShape.vue) | 155 | Türe, Fenster, Doppelfenster inklusive Flügel und Bogen |
-| [src/components/plan/InstallationShape.vue](src/components/plan/InstallationShape.vue) | 175 | Steckdose, Wasseranschluss, Heizkörper, Schacht mit Beschriftung |
+| [src/components/plan/InstallationShape.vue](src/components/plan/InstallationShape.vue) | 192 | Steckdose, Wasseranschluss, Heizkörper, Schacht mit Beschriftung |
 | [src/components/plan/DimensionRow.vue](src/components/plan/DimensionRow.vue) | 92 | Eine Bemaßungsreihe: Maßhilfslinien, Maßlinie, Schrägstriche, Zahlen |
+| [src/components/plan/ShaftDimensions.vue](src/components/plan/ShaftDimensions.vue) | 133 | Eigene Breiten- und Tiefenbemaßung eines Schachts |
 | [src/components/ribbon/RibbonToolbar.vue](src/components/ribbon/RibbonToolbar.vue) | 112 | Symbolleiste, Gruppen Datei/Werkzeuge/Formen/Installation/Ansicht |
 | [src/components/ribbon/RibbonButton.vue](src/components/ribbon/RibbonButton.vue) | 78 | Einzelner Ribbon-Knopf |
 | [src/components/ribbon/RibbonIcon.vue](src/components/ribbon/RibbonIcon.vue) | 23 | Rendert Pfade aus `ICONS` |
 | [src/components/ribbon/icons.ts](src/components/ribbon/icons.ts) | 26 | Pfaddaten aller Symbole auf 24×24-Raster |
 | [src/components/palette/PropertiesPalette.vue](src/components/palette/PropertiesPalette.vue) | 155 | Rechte Palette, verteilt auf die drei Eigenschaftsblöcke, Shortcut-Legende |
-| [src/components/palette/WallProperties.vue](src/components/palette/WallProperties.vue) | 147 | Wandeigenschaften, Objektliste der Wand |
-| [src/components/palette/OpeningProperties.vue](src/components/palette/OpeningProperties.vue) | 78 | Eigenschaften einer Öffnung |
-| [src/components/palette/InstallationProperties.vue](src/components/palette/InstallationProperties.vue) | 98 | Eigenschaften einer Installation |
+| [src/components/palette/WallProperties.vue](src/components/palette/WallProperties.vue) | 168 | Wandeigenschaften, Objektliste der Wand |
+| [src/components/palette/OpeningProperties.vue](src/components/palette/OpeningProperties.vue) | 86 | Eigenschaften einer Öffnung |
+| [src/components/palette/InstallationProperties.vue](src/components/palette/InstallationProperties.vue) | 111 | Eigenschaften einer Installation |
 | [src/components/dialogs/BaseDialog.vue](src/components/dialogs/BaseDialog.vue) | 133 | Modaler Rahmen, Tastaturbedienung, Fokus |
-| [src/components/dialogs/WallDialog.vue](src/components/dialogs/WallDialog.vue) | 132 | Dialog für eine neue Wand |
-| [src/components/dialogs/OpeningDialog.vue](src/components/dialogs/OpeningDialog.vue) | 97 | Dialog für eine neue Öffnung |
-| [src/components/dialogs/InstallationDialog.vue](src/components/dialogs/InstallationDialog.vue) | 98 | Dialog für eine neue Installation |
+| [src/components/dialogs/WallDialog.vue](src/components/dialogs/WallDialog.vue) | 147 | Dialog für eine neue Wand |
+| [src/components/dialogs/OpeningDialog.vue](src/components/dialogs/OpeningDialog.vue) | 107 | Dialog für eine neue Öffnung |
+| [src/components/dialogs/InstallationDialog.vue](src/components/dialogs/InstallationDialog.vue) | 113 | Dialog für eine neue Installation |
 | [src/components/dialogs/AnglePreview.vue](src/components/dialogs/AnglePreview.vue) | 115 | Winkelvorschau mit Pfeil, auch in der Palette verwendet |
-| [src/components/form/NumberField.vue](src/components/form/NumberField.vue) | 116 | Zahlenfeld mit Einheit, `commit` beim Verlassen |
-| [src/components/form/ObjectOffsetFields.vue](src/components/form/ObjectOffsetFields.vue) | 60 | Die zwei gekoppelten Abstandsfelder eines Wandobjekts |
+| [src/components/form/NumberField.vue](src/components/form/NumberField.vue) | 124 | Zahlenfeld mit Einheit, `commit` beim Verlassen, optional mit Rechenausdruck |
+| [src/components/form/ObjectOffsetFields.vue](src/components/form/ObjectOffsetFields.vue) | 65 | Die zwei gekoppelten Abstandsfelder eines Wandobjekts |
 | [src/components/form/TextField.vue](src/components/form/TextField.vue) | 50 | Textfeld |
+| [src/components/form/CheckField.vue](src/components/form/CheckField.vue) | 62 | Kontrollkästchen mit Erklärzeile, meldet `commit` sofort |
 | [src/components/form/OptionGroup.vue](src/components/form/OptionGroup.vue) | 99 | Radiogruppe als Segmentschalter, generisch über `T extends string` |
 | [src/components/StatusBar.vue](src/components/StatusBar.vue) | 63 | Cursorposition, Werkzeug, Zoom, Wandzahl |
 | [src/composables/usePlanStore.ts](src/composables/usePlanStore.ts) | 244 | Plan, Auswahl, Werkzeug, Undo, Autospeichern |
 | [src/composables/useViewport.ts](src/composables/useViewport.ts) | 118 | Pan und Zoom, Umrechnung Pixel ↔ Modell |
 | [src/composables/useSnapping.ts](src/composables/useSnapping.ts) | 53 | Einrasten an Endpunkten und Raster |
 | [src/composables/useShortcuts.ts](src/composables/useShortcuts.ts) | 119 | Globale Tastaturbedienung |
-| [src/composables/useDefaults.ts](src/composables/useDefaults.ts) | 110 | Zuletzt benutzte Dialogwerte, eigener Storage-Key |
+| [src/composables/useDefaults.ts](src/composables/useDefaults.ts) | 123 | Zuletzt benutzte Dialogwerte, eigener Storage-Key |
 | [src/composables/useModalState.ts](src/composables/useModalState.ts) | 27 | Zähler offener Dialoge |
-| [src/types/plan.ts](src/types/plan.ts) | 127 | Datenmodell und Typwächter |
+| [src/types/plan.ts](src/types/plan.ts) | 153 | Datenmodell und Typwächter |
 | [src/types/tools.ts](src/types/tools.ts) | 28 | Werkzeugliste samt Kürzeln |
 | [src/utils/geometry.ts](src/utils/geometry.ts) | 114 | Wandkoordinatensystem |
 | [src/utils/wallGeometry.ts](src/utils/wallGeometry.ts) | 117 | Eckenüberstand, Öffnungsintervalle, Wandsegmente, Bogenpfad |
-| [src/utils/objectSpacing.ts](src/utils/objectSpacing.ts) | 74 | Ausdehnung eines Objekts und Abstand zum vorigen Objekt |
-| [src/utils/dimensions.ts](src/utils/dimensions.ts) | 57 | Maßketten |
-| [src/utils/planStyle.ts](src/utils/planStyle.ts) | 162 | Maße und CSS der Zeichnung |
-| [src/utils/storage.ts](src/utils/storage.ts) | 191 | Parsen, Local Storage, Datei-Download und -Auswahl |
+| [src/utils/objectSpacing.ts](src/utils/objectSpacing.ts) | 78 | Ausdehnung eines Objekts und Abstand zum vorigen Objekt |
+| [src/utils/dimensions.ts](src/utils/dimensions.ts) | 77 | Maßketten |
+| [src/utils/expression.ts](src/utils/expression.ts) | 127 | Rechenausdrücke in Eingabefeldern |
+| [src/utils/planStyle.ts](src/utils/planStyle.ts) | 176 | Maße und CSS der Zeichnung |
+| [src/utils/storage.ts](src/utils/storage.ts) | 198 | Parsen, Local Storage, Datei-Download und -Auswahl |
 | [src/utils/svgExport.ts](src/utils/svgExport.ts) | 64 | Aufbau des SVG-Dokuments |
 | [src/utils/id.ts](src/utils/id.ts) | 13 | Kurze IDs |
 
@@ -129,7 +132,7 @@ verdrehte Pläne, ohne dass etwas abstürzt:
 4. Beschriftungen werden bei `angle ∈ (90°, 270°]` um 180° gedreht
    ([isTextFlipped](src/utils/geometry.ts#L111)). Damit das punktgenau bleibt,
    liegen die Textanker auf der optischen Mitte, `PLAN_STYLE` setzt dafür
-   `dominant-baseline: central` ([planStyle.ts:160](src/utils/planStyle.ts#L160)).
+   `dominant-baseline: central` ([planStyle.ts:174](src/utils/planStyle.ts#L174)).
    Wird die Baseline geändert, verspringen alle gedrehten Zahlen um eine halbe
    Textzeile.
 
@@ -186,6 +189,7 @@ PlanCanvas <svg>                                    PlanCanvas.vue:266
  │              └─ WallShape je Wand
  │                   ├─ plan-wall-hit (transparente Klicklinie)
  │                   ├─ OpeningShape / InstallationShape je Objekt
+ │                   │    └─ ShaftDimensions nur beim Schacht
  │                   └─ DimensionRow für Detail- und Gesamtbemaßung
  └─ canvas-crosshair (pointer-events: none)          PlanCanvas.vue:280
 
@@ -226,7 +230,7 @@ Reihenfolgeabhängigkeiten:
 Plan als JSON-Schnappschuss ab und wird von jeder strukturellen Aktion am Ende
 selbst aufgerufen. Feldweise Bearbeitung in der Palette schreibt dagegen direkt
 in den Store und meldet `commit` erst im `change`-Ereignis des Feldes, also beim
-Verlassen oder bei Enter ([NumberField.vue:47](src/components/form/NumberField.vue#L47)).
+Verlassen oder bei Enter ([NumberField.vue:55](src/components/form/NumberField.vue#L55)).
 
 Daraus folgt: zwischen zwei Commits liegt beliebig viel Tipparbeit, und
 `undo()` ruft deshalb zuerst selbst `commit()` auf
@@ -271,9 +275,9 @@ Zugriff auf die Zeichnungsgruppe.
 | Schlüssel | Ort | Inhalt |
 | --- | --- | --- |
 | `home-planner:plan` | [storage.ts:15](src/utils/storage.ts#L15) | aktueller Plan, geschrieben von einem `deep`-Watcher [usePlanStore.ts:34](src/composables/usePlanStore.ts#L34) |
-| `home-planner:defaults` | [useDefaults.ts:32](src/composables/useDefaults.ts#L32) | zuletzt bestätigte Dialogwerte, `deep`-Watcher [useDefaults.ts:96](src/composables/useDefaults.ts#L96) |
+| `home-planner:defaults` | [useDefaults.ts:43](src/composables/useDefaults.ts#L43) | zuletzt bestätigte Dialogwerte, `deep`-Watcher [useDefaults.ts:109](src/composables/useDefaults.ts#L109) |
 
-`parsePlan` [storage.ts:110](src/utils/storage.ts#L110) ist die einzige Grenze zur
+`parsePlan` [storage.ts:117](src/utils/storage.ts#L117) ist die einzige Grenze zur
 Außenwelt und toleriert alles: unbekannte Felder fallen weg, fehlende oder
 falsch typisierte Werte werden durch Vorgaben ersetzt, Objekte mit unbekanntem
 `kind` verschwinden. Ein Plan gelangt nie ungeprüft in den Store — auch der
@@ -289,11 +293,13 @@ Alle Werte in Zentimetern, weil eine Benutzereinheit des SVG ein Zentimeter ist.
 | --- | --- | --- | --- |
 | `DIM_DETAIL_DISTANCE` | [16](src/utils/planStyle.ts#L16) | 40 | Vorgabe der Detailmaßlinie, gemessen ab **Wandaußenkante**, nicht ab Mittellinie |
 | `DIM_TOTAL_DISTANCE` | [19](src/utils/planStyle.ts#L19) | 85 | Vorgabe der Gesamtmaßlinie, ebenfalls ab Außenkante |
-| `DIM_TEXT_SIZE` | [22](src/utils/planStyle.ts#L22) | 16 | Höhe der Maßzahlen |
-| `DIM_TICK` | [25](src/utils/planStyle.ts#L25) | 7 | halbe Länge des 45°-Schrägstrichs |
-| `DIM_EXTENSION_GAP` | [28](src/utils/planStyle.ts#L28) | 6 | Luft zwischen Wandkante und Maßhilfslinie |
-| `DIM_EXTENSION_OVERSHOOT` | [31](src/utils/planStyle.ts#L31) | 10 | Überstand der Maßhilfslinie über die Maßlinie |
-| `LABEL_TEXT_SIZE` | [34](src/utils/planStyle.ts#L34) | 13 | Höhe der Objektbeschriftungen |
+| `DIM_SHAFT_DISTANCE` | [26](src/utils/planStyle.ts#L26) | 18 | Abstand der beiden eigenen Maßlinien eines Schachts von dessen Kanten |
+| `DIM_TEXT_SIZE` | [29](src/utils/planStyle.ts#L29) | 16 | Höhe der Maßzahlen |
+| `DIM_ROW_HEIGHT` | [36](src/utils/planStyle.ts#L36) | 21,6 | Platzbedarf einer Maßreihe hinter ihrer Linie, also bis zur Außenkante der Zahl |
+| `DIM_TICK` | [39](src/utils/planStyle.ts#L39) | 7 | halbe Länge des 45°-Schrägstrichs |
+| `DIM_EXTENSION_GAP` | [42](src/utils/planStyle.ts#L42) | 6 | Luft zwischen Wandkante und Maßhilfslinie |
+| `DIM_EXTENSION_OVERSHOOT` | [45](src/utils/planStyle.ts#L45) | 10 | Überstand der Maßhilfslinie über die Maßlinie |
+| `LABEL_TEXT_SIZE` | [48](src/utils/planStyle.ts#L48) | 13 | Höhe der Objektbeschriftungen |
 
 Die beiden ersten Werte sind **nur noch Vorgaben**: jede Wand trägt ihren
 eigenen vorzeichenbehafteten Abstand in `totalDimension` und `detailDimension`
@@ -301,13 +307,18 @@ eigenen vorzeichenbehafteten Abstand in `totalDimension` und `detailDimension`
 Wände und als Ersatzwert beim Laden alter Pläne
 ([parseDimensionOffset](src/utils/storage.ts#L44)).
 
+`DIM_ROW_HEIGHT` ist abgeleitet: die Maßzahl sitzt `0,85 × DIM_TEXT_SIZE` hinter
+der Maßlinie und ist dort zentriert, ihre Außenkante liegt also `1,35 ×
+DIM_TEXT_SIZE` dahinter. Wer etwas hinter einer Maßreihe zeichnet, muss diesen
+Abstand einhalten; genau dafür braucht ihn die Beschriftung des Schachts.
+
 Beide Reihen dürfen auf derselben Seite liegen. Damit sie sich nicht überlagern,
 muss ihr Abstandsunterschied größer bleiben als
 `DIM_TEXT_SIZE + DIM_EXTENSION_OVERSHOOT`, also größer als 26; bei den Vorgaben
 sind es 45. Wer die Werte in der Palette frei setzt, kann sie überlappen lassen —
 das wird nicht geprüft.
 
-`PLAN_STYLE` [planStyle.ts:36](src/utils/planStyle.ts#L36) definiert `--plan-line`
+`PLAN_STYLE` [planStyle.ts:50](src/utils/planStyle.ts#L50) definiert `--plan-line`
 (1) und `--plan-hairline` (0,7) auf dem `svg`-Element. Die Zeichenfläche
 überschreibt beide inline aus dem Zoom
 ([PlanCanvas.vue:47](src/components/canvas/PlanCanvas.vue#L47)):
@@ -319,17 +330,20 @@ weil nur die Gruppe geklont wird — die Datei bekommt dadurch feste Strichstär
 
 | Konstante | Zeile | Wert | Bedeutung |
 | --- | --- | --- | --- |
-| `SYMBOL_RADIUS` | [18](src/components/plan/InstallationShape.vue#L18) | 9 | Radius von Steckdosenhalbkreis und Wasserkreis |
-| `RADIATOR_DEPTH` | [21](src/components/plan/InstallationShape.vue#L21) | 12 | Tiefe des Heizkörperrechtecks |
-| `SHAFT_WIDTH` / `SHAFT_DEPTH` | [24](src/components/plan/InstallationShape.vue#L24) | 60 / 40 | Ersatzmaße eines Schachts ohne eigene Angabe |
+| `SYMBOL_RADIUS` | [19](src/components/plan/InstallationShape.vue#L19) | 9 | Radius von Steckdosenhalbkreis und Wasserkreis |
+| `RADIATOR_DEPTH` | [22](src/components/plan/InstallationShape.vue#L22) | 12 | Tiefe des Heizkörperrechtecks |
+| `SHAFT_WIDTH` / `SHAFT_DEPTH` | [25](src/components/plan/InstallationShape.vue#L25) | 60 / 40 | Ersatzmaße eines Schachts ohne eigene Angabe |
 
 Abgeleitet: Stiel der Steckdose `SYMBOL_RADIUS × 1.9 = 17,1`; Beschriftungsabstand
-`RADIATOR_DEPTH + LABEL_TEXT_SIZE = 25` beim Heizkörper, `Tiefe + LABEL_TEXT_SIZE`
-beim Schacht, sonst `SYMBOL_RADIUS × 2.6 = 23,4`
-([Zeile 76](src/components/plan/InstallationShape.vue#L76)).
+`RADIATOR_DEPTH + LABEL_TEXT_SIZE = 25` beim Heizkörper,
+`Tiefe + DIM_SHAFT_DISTANCE + DIM_ROW_HEIGHT + LABEL_TEXT_SIZE` beim Schacht,
+sonst `SYMBOL_RADIUS × 2.6 = 23,4`
+([Zeile 83](src/components/plan/InstallationShape.vue#L83)).
 Bis auf den Schacht bleiben alle unter der Vorgabe `DIM_DETAIL_DISTANCE = 40`,
-sonst schneidet ein Symbol die Maßlinie. Ein tiefer Schacht überschreitet sie;
-dann ist der Abstand der Maßlinie an der Wand zu erhöhen.
+sonst schneidet ein Symbol die Maßlinie. Der Schacht überschreitet sie in jedem
+Fall, weil seine Beschriftung hinter seiner eigenen Breitenbemaßung sitzt — bei
+Vorgabetiefe 40 sind es 92,6 cm. Liegt er auf derselben Seite wie eine
+Wandbemaßung, ist deren Abstand an der Wand zu erhöhen.
 
 ### Ansicht — [src/composables/useViewport.ts](src/composables/useViewport.ts)
 
@@ -404,16 +418,26 @@ Rechtecke sehen nur deshalb wie ein durchgehender Körper aus, weil `PlanView`
 erst alle Konturen und danach alle Füllungen zeichnet; die Füllung deckt jede
 Kontur ab, die durch sie hindurchläuft. Weil sie dabei auch die innere Hälfte
 der eigenen Kontur deckt, ist `.plan-wall-outline` doppelt so breit gesetzt wie
-die Linie erscheinen soll ([planStyle.ts:46](src/utils/planStyle.ts#L46)).
+die Linie erscheinen soll ([planStyle.ts:60](src/utils/planStyle.ts#L60)).
 
 **Schacht.** Ein Rechteck, das mit `length` entlang der Wand und mit `depth` in
 den Raum ragt, gezeichnet als ein einziger offener Pfad
-([InstallationShape.vue:62](src/components/plan/InstallationShape.vue#L62)): SVG
+([InstallationShape.vue:63](src/components/plan/InstallationShape.vue#L63)): SVG
 füllt einen offenen Pfad, als wäre er geschlossen, zeichnet aber nur die
 angegebenen Segmente. So bekommt der Schacht seine Kontur auf den drei freien
 Seiten, und die vierte, die in der Wandfläche liegt, bleibt strichlos — sonst
 zerschnitte eine Linie die Wand. Der Schacht hat keine sinnvolle Montagehöhe;
 `height` wird auf 0 gesetzt und die Beschriftung zeigt nur den freien Text.
+
+Als einziges Objekt hat er eine Ausdehnung in beide Richtungen, und seine Tiefe
+zeigt von der Wand weg — eine Reihe entlang der Wand kann sie nie zeigen. Er
+bringt deshalb seine eigene Bemaßung mit
+([ShaftDimensions](src/components/plan/ShaftDimensions.vue)): die Breite hinter
+der Außenkante, die Tiefe neben der rechten Kante, beide mit den Klassen von
+`DimensionRow`. Die Tiefenzahl steht um 90° gedreht und folgt derselben
+Umkehrung wie alle anderen Beschriftungen. Das Kästchen *in Bemaßung
+berücksichtigen* steuert beim Schacht nur, ob er **zusätzlich** in der
+Detailbemaßung der Wand auftaucht; seine eigenen Maßpfeile bleiben immer.
 
 **Öffnung.** Reihenfolge im DOM und damit von hinten nach vorne:
 weißes Leibungsrechteck ohne Kontur, die zwei Laibungslinien, die beiden
@@ -439,48 +463,72 @@ Anschlagteil bleibt ohne Wirkung.
 den kurzen Weg. Für genau 180° ist das Kreuzprodukt null und die Richtung
 unbestimmt — der Halbkreis der Steckdose wird deshalb als eigener Pfad mit
 explizitem Flag gebaut
-([InstallationShape.vue:34](src/components/plan/InstallationShape.vue#L34)).
+([InstallationShape.vue:35](src/components/plan/InstallationShape.vue#L35)).
 
-**Maßkette.** [detailTicks](src/utils/dimensions.ts#L19) sammelt für jedes Objekt
+**Maßkette.** [detailTicks](src/utils/dimensions.ts#L24) sammelt für jedes Objekt
 beide Kanten aus [objectExtent](src/utils/objectSpacing.ts#L30) — bei Öffnungen
 die Leibungskanten, bei Heizkörper und Schacht die Enden ihrer `length`, bei
 allem anderen zweimal die Mitte —, klemmt alles auf `[0, length]` und wirft
 Punkte weg, die weniger als `EPSILON = 0.05` auseinander liegen. Ergibt die Kette
-nur ein Segment, liefert [detailSegments](src/utils/dimensions.ts#L52) eine leere
+nur ein Segment, liefert [detailSegments](src/utils/dimensions.ts#L72) eine leere
 Liste, damit eine objektlose Wand nicht zweimal dasselbe Maß trägt.
 
+Objekte mit `includeInDimension: false` liefern gar keine Punkte
+([isDimensioned](src/types/plan.ts#L140)). Damit bleibt die Kette lesbar, wenn
+zwei Objekte übereinander liegen — ein Heizkörper unter einem Fenster ergäbe
+sonst zwei Zahlenreihen im selben Maßstrang.
+
+**Bemaßungsrand.** [applyMargins](src/utils/dimensions.ts#L56) rückt in beiden
+Reihen nur den ersten und den letzten Strich um `dimensionMarginStart` bzw.
+`dimensionMarginEnd` nach innen. Das ist der einzige Ort, an dem gezeichnete
+Lage und gemessener Wert auseinanderfallen: `from`/`to` eines Segments sind
+Zeichenkoordinaten, `length` bleibt der Modellwert. Gemessen wird im
+Rauminneren, gespeichert wird die Mittellinie — die Ränder schließen diese
+Lücke, ohne eine einzige Maßzahl zu verändern. Objektstriche bleiben unberührt.
+
 **Objektabstände.** Dieselbe Ausdehnung ist die Grundlage der zweiten
-Positionsangabe in Dialog und Palette. [previousEnd](src/utils/objectSpacing.ts#L46)
+Positionsangabe in Dialog und Palette. [previousEnd](src/utils/objectSpacing.ts#L50)
 sucht das Objekt mit der größten Startkante vor dem eigenen Start und liefert
 dessen Endkante, sonst 0 für den Wandanfang;
-[gapBefore](src/utils/objectSpacing.ts#L58) ist die Differenz dazu und damit
+[gapBefore](src/utils/objectSpacing.ts#L62) ist die Differenz dazu und damit
 genau die Zahl, die in der Detailbemaßung zwischen beiden Objekten steht.
-[startForGap](src/utils/objectSpacing.ts#L67) rechnet zurück. Der Vorgänger wird
+[startForGap](src/utils/objectSpacing.ts#L71) rechnet zurück. Der Vorgänger wird
 dabei aus der **aktuellen** Lage bestimmt, nicht aus der neuen, sonst wanderte
-der Bezugspunkt beim Tippen mit.
+der Bezugspunkt beim Tippen mit. Objekte ohne Bemaßung kommen als Vorgänger
+nicht in Frage, sonst zeigte das Feld eine Zahl, die im Plan nirgends steht.
 [ObjectOffsetFields](src/components/form/ObjectOffsetFields.vue) hält beide
 Felder zusammen; `leading` gibt an, wie weit das Objekt vor seinem `offset`
 beginnt (halbe Länge bei Heizkörper und Schacht, 0 bei Öffnungen).
 
+**Rechenausdrücke.** Beide Abstandsfelder setzen `expression` an
+[NumberField](src/components/form/NumberField.vue) und lassen damit Eingaben wie
+`142/2+1` zu, ausgewertet von
+[evaluateExpression](src/utils/expression.ts) mit Punkt-vor-Strich, Klammern und
+Vorzeichen. Ein solches Feld ist ein `input type="text"`, hat also keine
+Pfeiltasten-Schrittweite mehr. Während des Tippens meldet es jeden auswertbaren
+Zwischenstand, beim Verlassen ersetzt es den Ausdruck durch sein Ergebnis; ist
+er unvollständig, bleibt der letzte gültige Wert stehen.
+
 **Auswahl.** Die Hervorhebung ist reines CSS über die Klasse `is-selected`
-([planStyle.ts:53](src/utils/planStyle.ts#L53) und
-[planStyle.ts:132](src/utils/planStyle.ts#L132)); der Export entfernt die Klasse an
+([planStyle.ts:67](src/utils/planStyle.ts#L67) und
+[planStyle.ts:146](src/utils/planStyle.ts#L146)); der Export entfernt die Klasse an
 allen geklonten Elementen.
 
 ## Fehlerbehandlung
 
 | Situation | Verhalten | Ort |
 | --- | --- | --- |
-| Kaputtes JSON im Local Storage | `catch` liefert `null`, Anwendung startet mit leerem Plan | [storage.ts:141](src/utils/storage.ts#L141) |
-| Local Storage nicht schreibbar (privater Modus, voll) | still ignoriert, Arbeit läuft ohne Persistenz weiter | [storage.ts:132](src/utils/storage.ts#L132) |
-| Datei ohne gültiges JSON geöffnet | `openPlanFromFile` liefert `null`, `openPlan` bricht **wortlos** ab — der Nutzer sieht keinen Hinweis | [storage.ts:185](src/utils/storage.ts#L185), [App.vue:70](src/App.vue#L70) |
-| Datei mit gültigem JSON, aber fremdem Aufbau | `parsePlan` erzeugt einen Plan aus Vorgabewerten, Wände können verschwinden | [storage.ts:110](src/utils/storage.ts#L110) |
+| Kaputtes JSON im Local Storage | `catch` liefert `null`, Anwendung startet mit leerem Plan | [storage.ts:149](src/utils/storage.ts#L149) |
+| Local Storage nicht schreibbar (privater Modus, voll) | still ignoriert, Arbeit läuft ohne Persistenz weiter | [storage.ts:140](src/utils/storage.ts#L140) |
+| Datei ohne gültiges JSON geöffnet | `openPlanFromFile` liefert `null`, `openPlan` bricht **wortlos** ab — der Nutzer sieht keinen Hinweis | [storage.ts:193](src/utils/storage.ts#L193), [App.vue:70](src/App.vue#L70) |
+| Datei mit gültigem JSON, aber fremdem Aufbau | `parsePlan` erzeugt einen Plan aus Vorgabewerten, Wände können verschwinden | [storage.ts:117](src/utils/storage.ts#L117) |
 | Export bei leerem Plan | `window.alert`, kein Download | [App.vue:84](src/App.vue#L84) |
 | Neuer Plan bei vorhandenen Wänden | `window.confirm`, Abbruch möglich | [App.vue:66](src/App.vue#L66) |
 | Auswahl zeigt nach Undo auf gelöschtes Objekt | `validateSelection` fällt auf die Wand oder auf `null` zurück | [usePlanStore.ts:61](src/composables/usePlanStore.ts#L61) |
-| Unlesbare Zahl im Eingabefeld | beim Verlassen auf den letzten gültigen Wert zurückgesetzt | [NumberField.vue:47](src/components/form/NumberField.vue#L47) |
+| Unlesbare Zahl oder unvollständiger Rechenausdruck im Eingabefeld | beim Verlassen auf den letzten gültigen Wert zurückgesetzt | [NumberField.vue:55](src/components/form/NumberField.vue#L55) |
 | Objekt ragt über das Wandende hinaus | Darstellung und Bemaßung klemmen den Wert, die Daten bleiben unverändert | [wallGeometry.ts:51](src/utils/wallGeometry.ts#L51) |
 | Plan mit `above`/`below`/`none` als Bemaßungsangabe | wird beim Laden in den vorzeichenbehafteten Abstand umgerechnet | [storage.ts:44](src/utils/storage.ts#L44) |
+| Objekt ohne `includeInDimension`, Wand ohne Bemaßungsränder | gelten als bemaßt bzw. als Rand 0, alte Dateien bleiben damit lesbar | [storage.ts:52](src/utils/storage.ts#L52) |
 
 Es gibt keinen `errorCaptured`-Hook, kein Logging und keine Meldung an den
 Nutzer außer den beiden genannten `window`-Dialogen. Ein Fehler in einer
@@ -493,7 +541,7 @@ Formkomponente reißt den Renderbaum ab, ohne dass etwas sichtbar wird.
 1. `InstallationKind` oder `OpeningKind` in
    [types/plan.ts:18](src/types/plan.ts#L18) ergänzen — daraus fällt `ToolId`
    automatisch an.
-2. Beschriftung in `OBJECT_LABELS` [types/plan.ts:119](src/types/plan.ts#L119).
+2. Beschriftung in `OBJECT_LABELS` [types/plan.ts:145](src/types/plan.ts#L145).
 3. Werkzeug samt freiem Tastenkürzel in `TOOLS`
    [types/tools.ts:15](src/types/tools.ts#L15) und in die passende Liste
    `SHAPE_TOOLS`/`INSTALLATION_TOOLS` [types/tools.ts:27](src/types/tools.ts#L27)
@@ -507,12 +555,12 @@ Formkomponente reißt den Renderbaum ab, ohne dass etwas sichtbar wird.
    Werkzeug zusätzlich in eine Gruppe von `TOOL_GROUPS` aufnehmen, sonst
    erscheint kein Knopf.
 5. Vorgabewerte in `createDefaults`
-   [useDefaults.ts:34](src/composables/useDefaults.ts#L34) **und** im
-   Zusammenbau in `restore` [useDefaults.ts:57](src/composables/useDefaults.ts#L57)
+   [useDefaults.ts:45](src/composables/useDefaults.ts#L45) **und** im
+   Zusammenbau in `restore` [useDefaults.ts:70](src/composables/useDefaults.ts#L70)
    — die Dialoge greifen ungeprüft auf `defaults.opening[kind]` bzw.
    `defaults.installation[kind]` zu.
 6. Zeichnung im passenden Zweig von
-   [InstallationShape.vue:99](src/components/plan/InstallationShape.vue#L99) bzw.
+   [InstallationShape.vue:108](src/components/plan/InstallationShape.vue#L108) bzw.
    [OpeningShape.vue:84](src/components/plan/OpeningShape.vue#L84).
 7. `parseObject` [storage.ts:52](src/utils/storage.ts#L52) kennt die neue Art
    über die Listen in [storage.ts:17](src/utils/storage.ts#L17); fehlt sie dort,
@@ -530,14 +578,15 @@ zusätzlich in `useDefaults` zurück, wenn er beim nächsten Einfügen vorbelegt
 soll.
 
 **Aussehen der Zeichnung ändern** (Farben, Strichstärken, Schrift):
-ausschließlich `PLAN_STYLE` [planStyle.ts:36](src/utils/planStyle.ts#L36). Weil
+ausschließlich `PLAN_STYLE` [planStyle.ts:50](src/utils/planStyle.ts#L50). Weil
 derselbe String in die Datei wandert, wirkt jede Änderung sofort auch im Export.
 Klassennamen dort und in den Formkomponenten sind nur über die Zeichenkette
 gekoppelt, nicht über den Compiler. Bei `.plan-wall-outline` daran denken, dass
 die Füllung die halbe Strichbreite abdeckt.
 
 **Position der Bemaßung ändern:** an einer einzelnen Wand über
-`totalDimension`/`detailDimension` in der Palette. Die Vorgabe für neue Wände
+`totalDimension`/`detailDimension` in der Palette, die Lage der äußeren Striche
+zusätzlich über `dimensionMarginStart`/`dimensionMarginEnd`. Die Vorgabe für neue Wände
 sind `DIM_TOTAL_DISTANCE` und `DIM_DETAIL_DISTANCE`
 [planStyle.ts:16-19](src/utils/planStyle.ts#L16-L19) zusammen mit den
 Startwerten in `createDefaults`; das Aussehen der Reihe selbst steckt in den
@@ -563,7 +612,7 @@ Grundidee; falls doch, ist der Angriffspunkt `onPointerMove`
 Zugstatus analog zu `draggingOrigin`. Objekte müssen dabei unangetastet bleiben,
 sie hängen über `offset` an der Wand.
 
-**Mehrfachauswahl.** `Selection` [types/plan.ts:105](src/types/plan.ts#L105) ist
+**Mehrfachauswahl.** `Selection` [types/plan.ts:120](src/types/plan.ts#L120) ist
 bewusst ein einzelner Verweis; alle Komponenten vergleichen direkt gegen
 `selection.wallId`/`selection.objectId`. Eine Liste zöge Änderungen durch
 `WallShape`, beide Formkomponenten, die Palette und `removeSelection`.
@@ -609,7 +658,7 @@ bewusst ein einzelner Verweis; alle Komponenten vergleichen direkt gegen
   `storage`-Ereignis-Abgleich.
 - **Unbenutzt im Code:** `radToDeg` [geometry.ts:21](src/utils/geometry.ts#L21),
   `localToWorld` [geometry.ts:62](src/utils/geometry.ts#L62), `isInstallation`
-  [types/plan.ts:114](src/types/plan.ts#L114) und die CSS-Klasse
-  `.plan-symbol-fill` [planStyle.ts:105](src/utils/planStyle.ts#L105) werden
+  [types/plan.ts:129](src/types/plan.ts#L129) und die CSS-Klasse
+  `.plan-symbol-fill` [planStyle.ts:119](src/utils/planStyle.ts#L119) werden
   nirgends aufgerufen. `localToWorld` ist der naheliegende Baustein, sobald
   Bearbeitung mit der Maus dazukommt.

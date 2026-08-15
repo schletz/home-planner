@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import CheckField from '@/components/form/CheckField.vue'
 import NumberField from '@/components/form/NumberField.vue'
 import ObjectOffsetFields from '@/components/form/ObjectOffsetFields.vue'
 import OptionGroup from '@/components/form/OptionGroup.vue'
 import TextField from '@/components/form/TextField.vue'
 import { usePlanStore } from '@/composables/usePlanStore'
-import type { Installation, Wall, WallSide } from '@/types/plan'
+import { isDimensioned, type Installation, type Wall, type WallSide } from '@/types/plan'
 
 /** Properties of the selected socket, water connection or radiator. */
 const props = defineProps<{ wall: Wall; installation: Installation }>()
@@ -25,6 +26,11 @@ const lengthLabel = computed(() => (isShaft.value ? 'Breite' : 'Länge'))
 /** Objects with an extent are placed by their centre, openings by their edge. */
 const leading = computed(() =>
   hasLength.value ? (props.installation.length ?? 100) / 2 : 0,
+)
+const dimensionHint = computed(() =>
+  isShaft.value
+    ? 'Der Schacht wird immer selbst bemaßt; die Option steuert nur den Eintrag in der Wandbemaßung.'
+    : 'Ausschalten, wenn ein anderes Objekt an derselben Stelle sitzt.',
 )
 
 function set(patch: Partial<Installation>): void {
@@ -73,6 +79,13 @@ function set(patch: Partial<Installation>): void {
       label="Wandseite"
       :options="SIDES"
       @update:model-value="set({ side: $event })"
+      @commit="store.commit()"
+    />
+    <CheckField
+      :model-value="isDimensioned(installation)"
+      label="In Bemaßung berücksichtigen"
+      :hint="dimensionHint"
+      @update:model-value="set({ includeInDimension: $event })"
       @commit="store.commit()"
     />
     <TextField

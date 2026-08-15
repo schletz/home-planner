@@ -53,6 +53,8 @@ export interface Opening {
   /** Depth of the door/window frame on each side in cm. */
   frame: number
   swing: SwingDirection
+  /** See {@link isDimensioned}; missing means `true`. */
+  includeInDimension?: boolean
   text?: string
 }
 
@@ -70,6 +72,8 @@ export interface Installation {
   depth?: number
   /** Wall face the installation is mounted on. */
   side: WallSide
+  /** See {@link isDimensioned}; missing means `true`. */
+  includeInDimension?: boolean
   text?: string
 }
 
@@ -89,6 +93,17 @@ export interface Wall {
   thickness: number
   totalDimension: DimensionOffset
   detailDimension: DimensionOffset
+  /**
+   * Inset of the first dimension tick from the wall start in cm, i.e. from the
+   * left end of a wall running to the right. Purely a drawing aid: measuring
+   * happens inside the room, while the wall itself is stored as its centre
+   * line, so the outermost ticks may need to move inwards by half the thickness
+   * of the adjoining wall. Neither the printed figures nor any object position
+   * change with it.
+   */
+  dimensionMarginStart: number
+  /** Inset of the last dimension tick from the wall end in cm. */
+  dimensionMarginEnd: number
   objects: WallObject[]
 }
 
@@ -113,6 +128,17 @@ export function isOpening(object: WallObject): object is Opening {
 
 export function isInstallation(object: WallObject): object is Installation {
   return !isOpening(object)
+}
+
+/**
+ * Whether an object takes part in the detail dimension row of its wall. Objects
+ * stacked on top of each other — a radiator below a window — would otherwise
+ * produce two chains of figures in the same row. The flag is missing in files
+ * written before it existed, therefore only an explicit `false` switches the
+ * object off.
+ */
+export function isDimensioned(object: WallObject): boolean {
+  return object.includeInDimension !== false
 }
 
 /** Human readable German names, used in the palette and in dialog titles. */

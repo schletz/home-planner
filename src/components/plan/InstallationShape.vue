@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import ShaftDimensions from '@/components/plan/ShaftDimensions.vue'
 import type { Installation, Wall } from '@/types/plan'
 import { clamp, isTextFlipped, sideSign } from '@/utils/geometry'
-import { LABEL_TEXT_SIZE } from '@/utils/planStyle'
+import { DIM_ROW_HEIGHT, DIM_SHAFT_DISTANCE, LABEL_TEXT_SIZE } from '@/utils/planStyle'
 
 /**
  * Socket, water connection, radiator or shaft. The symbol sits on the selected
@@ -67,15 +68,23 @@ const shaft = computed(() => {
   const outerY = faceY.value + sign.value * depth
   return {
     depth,
+    left,
+    right,
     body: `M ${left} ${faceY.value} L ${left} ${outerY} L ${right} ${outerY} L ${right} ${faceY.value}`,
     cross: `M ${left} ${faceY.value} L ${right} ${outerY} M ${left} ${outerY} L ${right} ${faceY.value}`,
   }
 })
 
-/** Distance of the label from the wall face, depends on the symbol size. */
+/**
+ * Distance of the label from the wall face, depends on the symbol size. The
+ * label of a shaft has to clear its own width dimension including the figures
+ * above it, so it sits noticeably further out than the other ones.
+ */
 const labelDistance = computed(() => {
   if (props.installation.kind === 'radiator') return RADIATOR_DEPTH + LABEL_TEXT_SIZE
-  if (props.installation.kind === 'shaft') return shaft.value.depth + LABEL_TEXT_SIZE
+  if (props.installation.kind === 'shaft') {
+    return shaft.value.depth + DIM_SHAFT_DISTANCE + DIM_ROW_HEIGHT + LABEL_TEXT_SIZE
+  }
   return SYMBOL_RADIUS * 2.6
 })
 
@@ -135,6 +144,14 @@ const flipped = computed(() => isTextFlipped(props.wall))
     <template v-else-if="installation.kind === 'shaft'">
       <path class="plan-shaft" :d="shaft.body" />
       <path class="plan-shaft-cross" :d="shaft.cross" />
+      <ShaftDimensions
+        :left="shaft.left"
+        :right="shaft.right"
+        :face-y="faceY"
+        :depth="shaft.depth"
+        :sign="sign"
+        :flipped="flipped"
+      />
     </template>
 
     <template v-else>
