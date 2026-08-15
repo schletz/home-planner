@@ -8,6 +8,9 @@ Alle Eingaben erfolgen über Zahlen in Dialogen und in der Palette, nicht über
 Ziehen mit der Maus. Die Anwendung läuft ohne Backend, der aktuelle Plan liegt im
 Local Storage des Browsers.
 
+Der innere Aufbau — Koordinatensysteme, Datenfluss, Konstanten und
+Erweiterungspunkte — steht in [DOCUMENTATION.md](DOCUMENTATION.md).
+
 ## Bedienung
 
 | Taste | Funktion |
