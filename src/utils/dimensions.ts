@@ -1,5 +1,6 @@
-import { isOpening, type Wall } from '@/types/plan'
+import type { Wall } from '@/types/plan'
 import { clamp, round } from '@/utils/geometry'
+import { objectExtent } from '@/utils/objectSpacing'
 
 /** A single measured distance along the wall, in wall-local x coordinates. */
 export interface DimensionSegment {
@@ -11,21 +12,16 @@ export interface DimensionSegment {
 const EPSILON = 0.05
 
 /**
- * Collects the tick positions of the detail dimension row: the wall ends, both
- * edges of every opening and the extent of every radiator. Sockets and water
- * connections are measured to their centre.
+ * Collects the tick positions of the detail dimension row: the wall ends plus
+ * both edges of every object. Objects without an extent contribute their centre
+ * twice, the duplicate is dropped below.
  */
 function detailTicks(wall: Wall): number[] {
   const ticks: number[] = [0, wall.length]
 
   for (const object of wall.objects) {
-    if (isOpening(object)) {
-      ticks.push(object.offset, object.offset + object.width)
-    } else if (object.kind === 'radiator' && object.length) {
-      ticks.push(object.offset - object.length / 2, object.offset + object.length / 2)
-    } else {
-      ticks.push(object.offset)
-    }
+    const extent = objectExtent(object)
+    ticks.push(extent.start, extent.end)
   }
 
   const inside = ticks

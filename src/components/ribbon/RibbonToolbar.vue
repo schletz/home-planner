@@ -24,7 +24,7 @@ function tool(id: ToolId): ToolDefinition {
 const TOOL_GROUPS: ReadonlyArray<{ caption: string; tools: ToolId[] }> = [
   { caption: 'Werkzeuge', tools: ['select', 'wall'] },
   { caption: 'Formen', tools: ['door', 'window', 'doubleWindow'] },
-  { caption: 'Installation', tools: ['socket', 'water', 'radiator'] },
+  { caption: 'Installation', tools: ['socket', 'water', 'radiator', 'shaft'] },
 ]
 </script>
 

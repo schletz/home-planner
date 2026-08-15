@@ -1,10 +1,50 @@
-import { isOpening, type Opening, type Wall } from '@/types/plan'
-import { clamp, round } from '@/utils/geometry'
+import { isOpening, type Opening, type Point, type Wall } from '@/types/plan'
+import { clamp, distanceToWall, round, wallEnd, wallStart } from '@/utils/geometry'
 
 /** A range along the wall in wall-local x coordinates. */
 export interface Span {
   from: number
   to: number
+}
+
+/** How far a wall body is drawn beyond its two end points, in cm. */
+export interface Overhang {
+  start: number
+  end: number
+}
+
+/** No overhang at all, used wherever junctions do not matter. */
+export const NO_OVERHANG: Overhang = { start: 0, end: 0 }
+
+/** Distance up to which a wall end counts as touching another wall, in cm. */
+const JUNCTION_TOLERANCE = 0.5
+
+/**
+ * Half thickness of the thickest wall that the given point sits on. A wall end
+ * drawn that much further reaches the far face of the wall it runs into, which
+ * closes the corner instead of leaving the notch that two centre line
+ * rectangles produce.
+ */
+function junctionOverhang(point: Point, wall: Wall, walls: Wall[]): number {
+  let overhang = 0
+  for (const other of walls) {
+    if (other.id === wall.id) continue
+    if (distanceToWall(other, point) > JUNCTION_TOLERANCE) continue
+    overhang = Math.max(overhang, other.thickness / 2)
+  }
+  return overhang
+}
+
+/**
+ * Overhang of a wall at both ends. Only ends that actually meet another wall
+ * are extended; a free standing end keeps its exact length, otherwise the
+ * drawing would no longer match the dimension figures.
+ */
+export function wallOverhang(wall: Wall, walls: Wall[]): Overhang {
+  return {
+    start: junctionOverhang(wallStart(wall), wall, walls),
+    end: junctionOverhang(wallEnd(wall), wall, walls),
+  }
 }
 
 /** Openings of a wall, clipped to the wall and sorted by position. */
@@ -21,9 +61,11 @@ export function openingSpans(wall: Wall): Span[] {
 
 /**
  * The solid parts of a wall, i.e. everything that is not covered by an opening.
- * Overlapping openings are merged so that no zero width piece is produced.
+ * Overlapping openings are merged so that no zero width piece is produced. The
+ * overhang stretches the outermost pieces past the wall ends into the walls
+ * they are joined to; openings keep their exact position.
  */
-export function bodySpans(wall: Wall): Span[] {
+export function bodySpans(wall: Wall, overhang: Overhang = NO_OVERHANG): Span[] {
   const holes: Span[] = []
   for (const span of openingSpans(wall)) {
     const last = holes[holes.length - 1]
@@ -32,12 +74,13 @@ export function bodySpans(wall: Wall): Span[] {
   }
 
   const spans: Span[] = []
-  let cursor = 0
+  const end = wall.length + overhang.end
+  let cursor = -overhang.start
   for (const hole of holes) {
     if (hole.from - cursor > 0.01) spans.push({ from: cursor, to: hole.from })
     cursor = Math.max(cursor, hole.to)
   }
-  if (wall.length - cursor > 0.01) spans.push({ from: cursor, to: wall.length })
+  if (end - cursor > 0.01) spans.push({ from: cursor, to: end })
   return spans
 }
 

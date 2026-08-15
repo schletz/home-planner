@@ -48,6 +48,11 @@ export function wallEnd(wall: Wall): Point {
   return { x: wall.x + d.x * wall.length, y: wall.y + d.y * wall.length }
 }
 
+/** SVG transform that maps the wall-local system to world coordinates. */
+export function wallTransform(wall: Wall): string {
+  return `translate(${wall.x} ${wall.y}) rotate(${-wall.angle})`
+}
+
 /** Sign of the local y axis for a wall side (`above` is negative local y). */
 export function sideSign(side: WallSide): -1 | 1 {
   return side === 'above' ? -1 : 1

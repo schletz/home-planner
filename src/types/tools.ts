@@ -21,7 +21,8 @@ export const TOOLS: ToolDefinition[] = [
   { id: 'socket', label: 'Steckdose', shortcut: 's', hint: 'Steckdose auf eine Wand setzen' },
   { id: 'water', label: 'Wasser', shortcut: 'a', hint: 'Wasseranschluss auf eine Wand setzen' },
   { id: 'radiator', label: 'Heizkörper', shortcut: 'h', hint: 'Heizkörper auf eine Wand setzen' },
+  { id: 'shaft', label: 'Schacht', shortcut: 'c', hint: 'Schacht vor eine Wand setzen, ragt in den Raum' },
 ]
 
 export const SHAPE_TOOLS: ToolId[] = ['door', 'window', 'doubleWindow']
-export const INSTALLATION_TOOLS: ToolId[] = ['socket', 'water', 'radiator']
+export const INSTALLATION_TOOLS: ToolId[] = ['socket', 'water', 'radiator', 'shaft']

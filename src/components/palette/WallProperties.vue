@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import AnglePreview from '@/components/dialogs/AnglePreview.vue'
 import NumberField from '@/components/form/NumberField.vue'
-import OptionGroup from '@/components/form/OptionGroup.vue'
 import { usePlanStore } from '@/composables/usePlanStore'
-import { OBJECT_LABELS, type DimensionPlacement, type Wall } from '@/types/plan'
+import { OBJECT_LABELS, type Wall } from '@/types/plan'
 
 /** Properties of the selected wall, edited directly in the palette. */
 const props = defineProps<{ wall: Wall }>()
 
 const store = usePlanStore()
-
-const PLACEMENTS: ReadonlyArray<{ value: DimensionPlacement; label: string }> = [
-  { value: 'above', label: 'Darüber' },
-  { value: 'below', label: 'Darunter' },
-  { value: 'none', label: 'Keine' },
-]
 
 function set(patch: Partial<Omit<Wall, 'id' | 'objects'>>): void {
   store.updateWall(props.wall.id, patch)
@@ -64,22 +57,26 @@ function set(patch: Partial<Omit<Wall, 'id' | 'objects'>>): void {
       <AnglePreview :angle="wall.angle" :thickness="wall.thickness" :size="108" :caption="false" />
     </div>
 
-    <OptionGroup
-      :model-value="wall.totalDimension"
-      label="Gesamtbemaßung"
-      :options="PLACEMENTS"
-      :columns="3"
-      @update:model-value="set({ totalDimension: $event })"
-      @commit="store.commit()"
-    />
-    <OptionGroup
-      :model-value="wall.detailDimension"
-      label="Detailbemaßung"
-      :options="PLACEMENTS"
-      :columns="3"
-      @update:model-value="set({ detailDimension: $event })"
-      @commit="store.commit()"
-    />
+    <div class="grid">
+      <NumberField
+        :model-value="wall.totalDimension"
+        label="Gesamtbemaßung"
+        :step="5"
+        @update:model-value="set({ totalDimension: $event })"
+        @commit="store.commit()"
+      />
+      <NumberField
+        :model-value="wall.detailDimension"
+        label="Detailbemaßung"
+        :step="5"
+        @update:model-value="set({ detailDimension: $event })"
+        @commit="store.commit()"
+      />
+    </div>
+    <p class="hint">
+      Abstand der Maßlinie von der Wand. Negativ liegt darüber, positiv darunter, 0 blendet die
+      Bemaßung aus.
+    </p>
 
     <div v-if="wall.objects.length" class="objects">
       <span class="objects-title">Objekte in dieser Wand</span>
@@ -113,6 +110,12 @@ function set(patch: Partial<Omit<Wall, 'id' | 'objects'>>): void {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   align-items: start;
+}
+.hint {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
 }
 .objects {
   display: grid;

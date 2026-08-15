@@ -1,5 +1,4 @@
 import {
-  type DimensionPlacement,
   type Installation,
   type InstallationKind,
   type Opening,
@@ -11,11 +10,12 @@ import {
   type WallSide,
 } from '@/types/plan'
 import { createId } from '@/utils/id'
+import { DIM_DETAIL_DISTANCE, DIM_TOTAL_DISTANCE } from '@/utils/planStyle'
 
 const PLAN_KEY = 'home-planner:plan'
 
 const OPENING_KINDS: OpeningKind[] = ['door', 'window', 'doubleWindow']
-const INSTALLATION_KINDS: InstallationKind[] = ['socket', 'water', 'radiator']
+const INSTALLATION_KINDS: InstallationKind[] = ['socket', 'water', 'radiator', 'shaft']
 const SWING_DIRECTIONS: SwingDirection[] = ['start-above', 'start-below', 'end-above', 'end-below']
 
 export function createEmptyPlan(): Plan {
@@ -34,6 +34,19 @@ function oneOf<T extends string>(value: unknown, allowed: readonly T[], fallback
   return typeof value === 'string' && (allowed as readonly string[]).includes(value)
     ? (value as T)
     : fallback
+}
+
+/**
+ * Reads the signed distance of a dimension row. Plans written while the row was
+ * still placed with `above`, `below` or `none` are translated to the default
+ * distance of that row, so an older file keeps its look.
+ */
+export function parseDimensionOffset(value: unknown, fallback: number): number {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (value === 'above') return -Math.abs(fallback)
+  if (value === 'below') return Math.abs(fallback)
+  if (value === 'none') return 0
+  return fallback
 }
 
 function parseObject(raw: unknown): WallObject | null {
@@ -63,6 +76,7 @@ function parseObject(raw: unknown): WallObject | null {
       side: oneOf<WallSide>(source.side, ['above', 'below'], 'above'),
     }
     if (typeof source.length === 'number') installation.length = num(source.length, 100)
+    if (typeof source.depth === 'number') installation.depth = num(source.depth, 40)
     if (typeof source.text === 'string' && source.text) installation.text = source.text
     return installation
   }
@@ -73,7 +87,6 @@ function parseObject(raw: unknown): WallObject | null {
 function parseWall(raw: unknown): Wall | null {
   if (typeof raw !== 'object' || raw === null) return null
   const source = raw as Record<string, unknown>
-  const placements: DimensionPlacement[] = ['above', 'below', 'none']
 
   return {
     id: typeof source.id === 'string' ? source.id : createId('wall'),
@@ -82,8 +95,8 @@ function parseWall(raw: unknown): Wall | null {
     length: Math.max(num(source.length, 100), 0),
     angle: num(source.angle, 0),
     thickness: Math.max(num(source.thickness, 25), 1),
-    totalDimension: oneOf(source.totalDimension, placements, 'above'),
-    detailDimension: oneOf(source.detailDimension, placements, 'above'),
+    totalDimension: parseDimensionOffset(source.totalDimension, -DIM_TOTAL_DISTANCE),
+    detailDimension: parseDimensionOffset(source.detailDimension, -DIM_DETAIL_DISTANCE),
     objects: Array.isArray(source.objects)
       ? source.objects.map(parseObject).filter((object): object is WallObject => object !== null)
       : [],

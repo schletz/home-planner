@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import NumberField from '@/components/form/NumberField.vue'
+import ObjectOffsetFields from '@/components/form/ObjectOffsetFields.vue'
 import OptionGroup from '@/components/form/OptionGroup.vue'
 import TextField from '@/components/form/TextField.vue'
 import { usePlanStore } from '@/composables/usePlanStore'
@@ -25,11 +26,11 @@ function set(patch: Partial<Opening>): void {
 <template>
   <div class="section">
     <div class="grid">
-      <NumberField
-        :model-value="opening.offset"
-        label="Abstand zum Wandanfang"
-        :min="0"
-        @update:model-value="set({ offset: $event })"
+      <ObjectOffsetFields
+        :wall="wall"
+        :offset="opening.offset"
+        :ignore-id="opening.id"
+        @update:offset="set({ offset: $event })"
         @commit="store.commit()"
       />
       <NumberField

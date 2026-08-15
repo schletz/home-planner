@@ -5,8 +5,8 @@ import { clamp, isTextFlipped, sideSign } from '@/utils/geometry'
 import { LABEL_TEXT_SIZE } from '@/utils/planStyle'
 
 /**
- * Socket, water connection or radiator. The symbol sits on the selected wall
- * face and points away from the wall, drawn in wall-local coordinates.
+ * Socket, water connection, radiator or shaft. The symbol sits on the selected
+ * wall face and points away from the wall, drawn in wall-local coordinates.
  */
 const props = defineProps<{
   wall: Wall
@@ -19,6 +19,10 @@ const SYMBOL_RADIUS = 9
 
 /** Depth of a radiator in cm. */
 const RADIATOR_DEPTH = 12
+
+/** Fallback extents of a shaft in cm, used when the data carries none. */
+const SHAFT_WIDTH = 60
+const SHAFT_DEPTH = 40
 
 const sign = computed(() => sideSign(props.installation.side))
 const half = computed(() => props.wall.thickness / 2)
@@ -48,10 +52,32 @@ const radiator = computed(() => {
   }
 })
 
+/**
+ * A shaft is a piece of building material sticking out of the wall, so it is
+ * drawn as a solid rectangle with the usual diagonal cross instead of a symbol.
+ * Only its three free sides carry a contour: the fourth one lies in the wall
+ * face and would cut the wall in two. An open path still fills as if it were
+ * closed, so a single path yields both the body and the correct outline.
+ */
+const shaft = computed(() => {
+  const width = Math.max(props.installation.length ?? SHAFT_WIDTH, 1)
+  const depth = Math.max(props.installation.depth ?? SHAFT_DEPTH, 1)
+  const left = centerX.value - width / 2
+  const right = centerX.value + width / 2
+  const outerY = faceY.value + sign.value * depth
+  return {
+    depth,
+    body: `M ${left} ${faceY.value} L ${left} ${outerY} L ${right} ${outerY} L ${right} ${faceY.value}`,
+    cross: `M ${left} ${faceY.value} L ${right} ${outerY} M ${left} ${outerY} L ${right} ${faceY.value}`,
+  }
+})
+
 /** Distance of the label from the wall face, depends on the symbol size. */
-const labelDistance = computed(() =>
-  props.installation.kind === 'radiator' ? RADIATOR_DEPTH + LABEL_TEXT_SIZE : SYMBOL_RADIUS * 2.6,
-)
+const labelDistance = computed(() => {
+  if (props.installation.kind === 'radiator') return RADIATOR_DEPTH + LABEL_TEXT_SIZE
+  if (props.installation.kind === 'shaft') return shaft.value.depth + LABEL_TEXT_SIZE
+  return SYMBOL_RADIUS * 2.6
+})
 
 const labelPoint = computed(() => ({
   x: centerX.value,
@@ -59,8 +85,10 @@ const labelPoint = computed(() => ({
 }))
 
 const label = computed(() => {
-  const parts = [props.installation.text?.trim(), `h=${props.installation.height}`]
-  return parts.filter(Boolean).join(' ')
+  const text = props.installation.text?.trim()
+  // A mounting height is meaningless for a shaft, it reaches from floor to ceiling.
+  if (props.installation.kind === 'shaft') return text ?? ''
+  return [text, `h=${props.installation.height}`].filter(Boolean).join(' ')
 })
 
 const flipped = computed(() => isTextFlipped(props.wall))
@@ -104,6 +132,11 @@ const flipped = computed(() => isTextFlipped(props.wall))
       />
     </template>
 
+    <template v-else-if="installation.kind === 'shaft'">
+      <path class="plan-shaft" :d="shaft.body" />
+      <path class="plan-shaft-cross" :d="shaft.cross" />
+    </template>
+
     <template v-else>
       <rect
         class="plan-symbol"
@@ -129,6 +162,7 @@ const flipped = computed(() => isTextFlipped(props.wall))
     </template>
 
     <text
+      v-if="label"
       class="plan-label"
       :x="labelPoint.x"
       :y="labelPoint.y"

@@ -8,7 +8,11 @@
  * export keeps the plain values.
  */
 
-/** Distance of the detail dimension row from the wall face, in cm. */
+/**
+ * Distance of the detail dimension row from the wall face, in cm. Every wall
+ * carries its own signed offset; this value is only the preset for new walls
+ * and the fallback for plans written before the offsets became free numbers.
+ */
 export const DIM_DETAIL_DISTANCE = 40
 
 /** Distance of the overall dimension row from the wall face, in cm. */
@@ -35,15 +39,26 @@ svg {
   --plan-hairline: 0.7;
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
-.plan-wall-body {
-  fill: #3f3f46;
+/* A light body with a dark outline keeps the black dimension lines readable
+   even where two walls meet in a tight corner. Outline and fill are two passes
+   over all walls (see PlanView): the fill covers the inner half of its own
+   outline, therefore the outline is drawn twice as wide as it should appear. */
+.plan-wall-outline {
+  fill: none;
   stroke: #18181b;
-  stroke-width: var(--plan-hairline);
+  stroke-width: calc(var(--plan-line) * 2);
   stroke-linejoin: miter;
+  pointer-events: none;
+}
+.plan-wall-outline.is-selected {
+  stroke: #1d4ed8;
+}
+.plan-wall-body {
+  fill: #dcdce0;
+  stroke: none;
 }
 .plan-wall-body.is-selected {
-  fill: #1d4ed8;
-  stroke: #1e3a8a;
+  fill: #bfdbfe;
 }
 .plan-wall-hit {
   fill: none;
@@ -60,7 +75,7 @@ svg {
   stroke-width: var(--plan-hairline);
 }
 .plan-opening-frame {
-  fill: #d4d4d8;
+  fill: #a1a1aa;
   stroke: #18181b;
   stroke-width: var(--plan-hairline);
 }
@@ -96,6 +111,23 @@ svg {
   stroke: #18181b;
   stroke-width: var(--plan-line);
   stroke-linecap: round;
+}
+/* A shaft is solid building material, so it is drawn like a wall body. Its
+   contour skips the side lying in the wall face, see InstallationShape. */
+.plan-shaft {
+  fill: #dcdce0;
+  stroke: #18181b;
+  stroke-width: var(--plan-line);
+  stroke-linejoin: miter;
+}
+.plan-shaft-cross {
+  fill: none;
+  stroke: #18181b;
+  stroke-width: var(--plan-hairline);
+}
+.plan-object.is-selected .plan-shaft {
+  fill: #bfdbfe;
+  stroke: #1d4ed8;
 }
 .plan-object.is-selected .plan-symbol,
 .plan-object.is-selected .plan-opening-frame {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import NumberField from '@/components/form/NumberField.vue'
+import ObjectOffsetFields from '@/components/form/ObjectOffsetFields.vue'
 import OptionGroup from '@/components/form/OptionGroup.vue'
 import TextField from '@/components/form/TextField.vue'
 import { usePlanStore } from '@/composables/usePlanStore'
@@ -16,7 +17,15 @@ const SIDES: ReadonlyArray<{ value: WallSide; label: string }> = [
   { value: 'below', label: 'Darunter' },
 ]
 
-const hasLength = computed(() => props.installation.kind === 'radiator')
+const isShaft = computed(() => props.installation.kind === 'shaft')
+const hasLength = computed(() => props.installation.kind === 'radiator' || isShaft.value)
+/** A shaft reaches from floor to ceiling, a mounting height says nothing. */
+const hasHeight = computed(() => !isShaft.value)
+const lengthLabel = computed(() => (isShaft.value ? 'Breite' : 'Länge'))
+/** Objects with an extent are placed by their centre, openings by their edge. */
+const leading = computed(() =>
+  hasLength.value ? (props.installation.length ?? 100) / 2 : 0,
+)
 
 function set(patch: Partial<Installation>): void {
   store.updateObject(props.wall.id, props.installation.id, patch)
@@ -26,14 +35,16 @@ function set(patch: Partial<Installation>): void {
 <template>
   <div class="section">
     <div class="grid">
-      <NumberField
-        :model-value="installation.offset"
-        label="Abstand zum Wandanfang"
-        :min="0"
-        @update:model-value="set({ offset: $event })"
+      <ObjectOffsetFields
+        :wall="wall"
+        :offset="installation.offset"
+        :leading="leading"
+        :ignore-id="installation.id"
+        @update:offset="set({ offset: $event })"
         @commit="store.commit()"
       />
       <NumberField
+        v-if="hasHeight"
         :model-value="installation.height"
         label="Höhe über Boden"
         :min="0"
@@ -43,9 +54,17 @@ function set(patch: Partial<Installation>): void {
       <NumberField
         v-if="hasLength"
         :model-value="installation.length ?? 100"
-        label="Länge"
+        :label="lengthLabel"
         :min="10"
         @update:model-value="set({ length: $event })"
+        @commit="store.commit()"
+      />
+      <NumberField
+        v-if="isShaft"
+        :model-value="installation.depth ?? 40"
+        label="Tiefe"
+        :min="1"
+        @update:model-value="set({ depth: $event })"
         @commit="store.commit()"
       />
     </div>

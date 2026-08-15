@@ -17,7 +17,7 @@ Erweiterungspunkte — steht in [DOCUMENTATION.md](DOCUMENTATION.md).
 | --- | --- |
 | `V` / `W` | Auswahl / Wand zeichnen |
 | `D` / `F` / `G` | Türe / Fenster / Doppelfenster |
-| `S` / `A` / `H` | Steckdose / Wasseranschluss / Heizkörper |
+| `S` / `A` / `H` / `C` | Steckdose / Wasseranschluss / Heizkörper / Schacht |
 | Pfeiltasten (mit `Shift` größere Schritte) | Zeichenfläche verschieben |
 | `Strg` `+` / `Strg` `-` / `Strg` `0` | Zoom hinein, hinaus, alles einpassen |
 | `Strg` `S` / `Strg` `O` / `Strg` `E` | Speichern, Öffnen, SVG-Export |
@@ -51,22 +51,39 @@ Laufrichtung der Wand.
     {
       "id": "wall-1", "x": 0, "y": 0,
       "length": 600, "angle": 0, "thickness": 30,
-      "totalDimension": "above",      // above | below | none
-      "detailDimension": "above",
+      "totalDimension": -85,          // cm ab Wandaußenkante, siehe unten
+      "detailDimension": -40,
       "objects": [
         { "id": "obj-1", "kind": "window", "offset": 120, "width": 140,
           "frame": 8, "swing": "start-above", "text": "Küche" },
         { "id": "obj-2", "kind": "socket", "offset": 320, "height": 30,
-          "side": "above" }
+          "side": "above" },
+        { "id": "obj-3", "kind": "shaft", "offset": 480, "height": 0,
+          "length": 60, "depth": 40, "side": "below" }
       ]
     }
   ]
 }
 ```
 
-`kind` ist `door`, `window`, `doubleWindow`, `socket`, `water` oder `radiator`.
-`swing` beschreibt den Anschlag (`start`/`end`) und die Öffnungsseite
-(`above`/`below`); beim Doppelfenster zählt nur die Seite.
+`kind` ist `door`, `window`, `doubleWindow`, `socket`, `water`, `radiator` oder
+`shaft`. `swing` beschreibt den Anschlag (`start`/`end`) und die Öffnungsseite
+(`above`/`below`); beim Doppelfenster zählt nur die Seite. Ein `shaft` ist ein
+Schacht, der mit `length` entlang der Wand und `depth` in den Raum hinein misst.
+
+`totalDimension` und `detailDimension` sind der Abstand der jeweiligen Maßlinie
+von der Wandaußenkante in cm: negativ liegt sie auf der `above`-Seite, positiv
+auf der `below`-Seite, `0` blendet die Reihe aus. Ältere Dateien mit `above`,
+`below` oder `none` werden beim Laden umgerechnet.
+
+### Objekte positionieren
+
+Jedes Objekt speichert nur seinen `offset` ab Wandanfang. In Dialog und Palette
+steht daneben der *Abstand zum vorigen Objekt* — die lichte Weite bis zur
+Hinterkante des Objekts davor, also genau die Zahl, die in der Detailbemaßung
+zwischen den beiden steht. Beide Felder beschreiben dieselbe Lage; wer das eine
+ändert, bekommt das andere neu gerechnet. Gibt es kein voriges Objekt, wird ab
+Wandanfang gemessen.
 
 ## SVG-Export
 

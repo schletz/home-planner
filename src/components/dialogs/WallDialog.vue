@@ -3,9 +3,8 @@ import { reactive } from 'vue'
 import AnglePreview from '@/components/dialogs/AnglePreview.vue'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import NumberField from '@/components/form/NumberField.vue'
-import OptionGroup from '@/components/form/OptionGroup.vue'
 import { useDefaults } from '@/composables/useDefaults'
-import type { DimensionPlacement, Point, Wall } from '@/types/plan'
+import type { Point, Wall } from '@/types/plan'
 import { normalizeAngle } from '@/utils/geometry'
 
 /** Dialog for a new wall. The start point comes from the click on the canvas. */
@@ -27,12 +26,6 @@ const draft = reactive({
   totalDimension: defaults.wall.totalDimension,
   detailDimension: defaults.wall.detailDimension,
 })
-
-const PLACEMENTS: ReadonlyArray<{ value: DimensionPlacement; label: string }> = [
-  { value: 'above', label: 'Darüber' },
-  { value: 'below', label: 'Darunter' },
-  { value: 'none', label: 'Keine' },
-]
 
 const QUICK_ANGLES = [0, 90, 180, 270]
 
@@ -85,18 +78,14 @@ function confirm(): void {
       <AnglePreview :angle="draft.angle" :thickness="draft.thickness" />
     </div>
 
-    <OptionGroup
-      v-model="draft.totalDimension"
-      label="Gesamtbemaßung"
-      :options="PLACEMENTS"
-      :columns="3"
-    />
-    <OptionGroup
-      v-model="draft.detailDimension"
-      label="Detailbemaßung"
-      :options="PLACEMENTS"
-      :columns="3"
-    />
+    <div class="grid">
+      <NumberField v-model="draft.totalDimension" label="Gesamtbemaßung" :step="5" />
+      <NumberField v-model="draft.detailDimension" label="Detailbemaßung" :step="5" />
+    </div>
+    <p class="hint">
+      Abstand der Maßlinie von der Wand. Negativ liegt darüber, positiv darunter, 0 blendet die
+      Bemaßung aus.
+    </p>
   </BaseDialog>
 </template>
 
@@ -111,6 +100,11 @@ function confirm(): void {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
+}
+.hint {
+  margin: -4px 0 0;
+  font-size: 12px;
+  color: #6b7280;
 }
 .angle-input {
   display: grid;

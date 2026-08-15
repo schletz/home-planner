@@ -22,7 +22,7 @@ const title = computed(() => {
 const SHORTCUTS: ReadonlyArray<[string, string]> = [
   ['V / W', 'Auswahl / Wand zeichnen'],
   ['D / F / G', 'Türe / Fenster / Doppelfenster'],
-  ['S / A / H', 'Steckdose / Wasser / Heizkörper'],
+  ['S / A / H / C', 'Steckdose / Wasser / Heizkörper / Schacht'],
   ['Pfeiltasten', 'Zeichenfläche verschieben'],
   ['Strg + / Strg -', 'Zoom'],
   ['Strg 0', 'Alles einpassen'],

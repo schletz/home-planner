@@ -2,6 +2,7 @@
 import { computed, reactive } from 'vue'
 import BaseDialog from '@/components/dialogs/BaseDialog.vue'
 import NumberField from '@/components/form/NumberField.vue'
+import ObjectOffsetFields from '@/components/form/ObjectOffsetFields.vue'
 import OptionGroup from '@/components/form/OptionGroup.vue'
 import TextField from '@/components/form/TextField.vue'
 import { useDefaults } from '@/composables/useDefaults'
@@ -72,7 +73,7 @@ function confirm(): void {
 <template>
   <BaseDialog :title="title" @confirm="confirm" @cancel="emit('cancel')">
     <div class="grid">
-      <NumberField v-model="draft.offset" label="Abstand zum Wandanfang" :min="0" />
+      <ObjectOffsetFields :wall="wall" v-model:offset="draft.offset" />
       <NumberField v-model="draft.width" label="Breite" :min="1" />
       <NumberField v-model="draft.frame" label="Rand (Stock)" :min="0" />
     </div>

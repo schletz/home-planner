@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Wall, WallSide } from '@/types/plan'
+import type { Wall } from '@/types/plan'
 import type { DimensionSegment } from '@/utils/dimensions'
-import { isTextFlipped, round, sideSign } from '@/utils/geometry'
+import { isTextFlipped, round } from '@/utils/geometry'
 import {
   DIM_EXTENSION_GAP,
   DIM_EXTENSION_OVERSHOOT,
@@ -18,14 +18,17 @@ import {
 const props = defineProps<{
   wall: Wall
   segments: DimensionSegment[]
-  side: WallSide
-  /** Distance of the dimension line from the wall face in cm. */
+  /**
+   * Signed distance of the dimension line from the wall face in cm. Negative
+   * puts the row on the `above` side, positive on the `below` side.
+   */
   distance: number
 }>()
 
-const sign = computed(() => sideSign(props.side))
+/** Local y direction of the row, matching `sideSign` of the chosen side. */
+const sign = computed(() => (props.distance < 0 ? -1 : 1))
 const faceY = computed(() => sign.value * (props.wall.thickness / 2))
-const lineY = computed(() => faceY.value + sign.value * props.distance)
+const lineY = computed(() => faceY.value + props.distance)
 
 /** Every measuring point, i.e. the segment borders without duplicates. */
 const ticks = computed(() => {

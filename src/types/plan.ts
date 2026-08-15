@@ -18,7 +18,7 @@ export interface Point {
 export type OpeningKind = 'door' | 'window' | 'doubleWindow'
 
 /** Installations are drawn on top of the wall body. */
-export type InstallationKind = 'socket' | 'water' | 'radiator'
+export type InstallationKind = 'socket' | 'water' | 'radiator' | 'shaft'
 
 export type WallObjectKind = OpeningKind | InstallationKind
 
@@ -35,8 +35,12 @@ export type WallSide = 'above' | 'below'
  */
 export type SwingDirection = 'start-above' | 'start-below' | 'end-above' | 'end-below'
 
-/** Placement of a dimension row, `none` hides the row for that wall. */
-export type DimensionPlacement = WallSide | 'none'
+/**
+ * Distance of a dimension row from the wall face in cm. The sign picks the
+ * side: negative values put the row on the `above` side, positive ones on the
+ * `below` side, `0` hides the row for that wall.
+ */
+export type DimensionOffset = number
 
 /** Door, window or double window sitting inside a wall. */
 export interface Opening {
@@ -52,16 +56,18 @@ export interface Opening {
   text?: string
 }
 
-/** Socket, water connection or radiator mounted on a wall. */
+/** Socket, water connection, radiator or shaft mounted on a wall. */
 export interface Installation {
   id: string
   kind: InstallationKind
   /** Distance of the symbol centre from the wall start, in cm. */
   offset: number
-  /** Mounting height above finished floor in cm. */
+  /** Mounting height above finished floor in cm. Meaningless for a shaft. */
   height: number
-  /** Length along the wall in cm. Only used by radiators. */
+  /** Extent along the wall in cm. Only used by radiators and shafts. */
   length?: number
+  /** How far a shaft sticks out of the wall face into the room, in cm. */
+  depth?: number
   /** Wall face the installation is mounted on. */
   side: WallSide
   text?: string
@@ -81,8 +87,8 @@ export interface Wall {
   angle: number
   /** Wall thickness in cm, extruded symmetrically around the centre line. */
   thickness: number
-  totalDimension: DimensionPlacement
-  detailDimension: DimensionPlacement
+  totalDimension: DimensionOffset
+  detailDimension: DimensionOffset
   objects: WallObject[]
 }
 
@@ -117,4 +123,5 @@ export const OBJECT_LABELS: Record<WallObjectKind, string> = {
   socket: 'Steckdose',
   water: 'Wasseranschluss',
   radiator: 'Heizkörper',
+  shaft: 'Schacht',
 }

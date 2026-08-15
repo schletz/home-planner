@@ -3,16 +3,18 @@ import { computed } from 'vue'
 import DimensionRow from '@/components/plan/DimensionRow.vue'
 import InstallationShape from '@/components/plan/InstallationShape.vue'
 import OpeningShape from '@/components/plan/OpeningShape.vue'
-import { isOpening, type Selection, type Wall, type WallSide } from '@/types/plan'
+import { isOpening, type Selection, type Wall } from '@/types/plan'
 import { detailSegments, totalSegments } from '@/utils/dimensions'
-import { DIM_DETAIL_DISTANCE, DIM_TOTAL_DISTANCE } from '@/utils/planStyle'
-import { bodySpans } from '@/utils/wallGeometry'
+import { wallTransform } from '@/utils/geometry'
 
 /**
- * A complete wall: the solid body between its openings, all objects sitting in
- * the wall and the two dimension rows. The group transform maps wall-local
- * coordinates to the world, so every child can be drawn as if the wall started
- * at the origin and ran along the x axis.
+ * Everything of a wall that sits on top of its body: the click area, all
+ * objects inside the wall and the two dimension rows. The body itself is drawn
+ * by `WallBody` in an earlier pass, because corners can only be closed when all
+ * walls are painted together.
+ *
+ * The group transform maps wall-local coordinates to the world, so every child
+ * can be drawn as if the wall started at the origin and ran along the x axis.
  */
 const props = defineProps<{
   wall: Wall
@@ -26,16 +28,7 @@ const emit = defineEmits<{
   (event: 'pick-object', payload: PointerEvent, objectId: string): void
 }>()
 
-const transform = computed(
-  () => `translate(${props.wall.x} ${props.wall.y}) rotate(${-props.wall.angle})`,
-)
-
-const spans = computed(() => bodySpans(props.wall))
-const half = computed(() => props.wall.thickness / 2)
-
-const wallSelected = computed(
-  () => props.selection?.wallId === props.wall.id && !props.selection.objectId,
-)
+const transform = computed(() => wallTransform(props.wall))
 
 function objectSelected(objectId: string): boolean {
   return props.selection?.wallId === props.wall.id && props.selection.objectId === objectId
@@ -43,10 +36,6 @@ function objectSelected(objectId: string): boolean {
 
 const detail = computed(() => detailSegments(props.wall))
 const total = computed(() => totalSegments(props.wall))
-
-function placement(side: Wall['totalDimension']): WallSide | null {
-  return side === 'none' ? null : side
-}
 </script>
 
 <template>
@@ -58,18 +47,6 @@ function placement(side: Wall['totalDimension']): WallSide | null {
       :x2="wall.length"
       :y2="0"
       :stroke-width="Math.max(wall.thickness, hitWidth)"
-      @pointerdown="emit('pick-wall', $event)"
-    />
-
-    <rect
-      v-for="span in spans"
-      :key="`${span.from}-${span.to}`"
-      class="plan-wall-body"
-      :class="{ 'is-selected': wallSelected }"
-      :x="span.from"
-      :y="-half"
-      :width="span.to - span.from"
-      :height="wall.thickness"
       @pointerdown="emit('pick-wall', $event)"
     />
 
@@ -88,19 +65,18 @@ function placement(side: Wall['totalDimension']): WallSide | null {
       />
     </g>
 
+    <!-- An offset of zero switches the row off. -->
     <DimensionRow
-      v-if="placement(wall.detailDimension)"
+      v-if="wall.detailDimension"
       :wall="wall"
       :segments="detail"
-      :side="placement(wall.detailDimension)!"
-      :distance="DIM_DETAIL_DISTANCE"
+      :distance="wall.detailDimension"
     />
     <DimensionRow
-      v-if="placement(wall.totalDimension)"
+      v-if="wall.totalDimension"
       :wall="wall"
       :segments="total"
-      :side="placement(wall.totalDimension)!"
-      :distance="DIM_TOTAL_DISTANCE"
+      :distance="wall.totalDimension"
     />
   </g>
 </template>

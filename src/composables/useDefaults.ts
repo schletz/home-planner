@@ -1,11 +1,13 @@
 import { reactive, watch } from 'vue'
 import type {
-  DimensionPlacement,
+  DimensionOffset,
   InstallationKind,
   OpeningKind,
   SwingDirection,
   WallSide,
 } from '@/types/plan'
+import { DIM_DETAIL_DISTANCE, DIM_TOTAL_DISTANCE } from '@/utils/planStyle'
+import { parseDimensionOffset } from '@/utils/storage'
 
 /**
  * Values the insert dialogs are pre-filled with. They are updated whenever an
@@ -17,11 +19,14 @@ export interface PlannerDefaults {
     thickness: number
     length: number
     angle: number
-    totalDimension: DimensionPlacement
-    detailDimension: DimensionPlacement
+    totalDimension: DimensionOffset
+    detailDimension: DimensionOffset
   }
   opening: Record<OpeningKind, { width: number; frame: number; swing: SwingDirection }>
-  installation: Record<InstallationKind, { height: number; length: number; side: WallSide }>
+  installation: Record<
+    InstallationKind,
+    { height: number; length: number; depth: number; side: WallSide }
+  >
 }
 
 const DEFAULTS_KEY = 'home-planner:defaults'
@@ -32,8 +37,8 @@ function createDefaults(): PlannerDefaults {
       thickness: 25,
       length: 400,
       angle: 0,
-      totalDimension: 'above',
-      detailDimension: 'above',
+      totalDimension: -DIM_TOTAL_DISTANCE,
+      detailDimension: -DIM_DETAIL_DISTANCE,
     },
     opening: {
       door: { width: 90, frame: 6, swing: 'start-above' },
@@ -41,9 +46,10 @@ function createDefaults(): PlannerDefaults {
       doubleWindow: { width: 240, frame: 8, swing: 'start-above' },
     },
     installation: {
-      socket: { height: 30, length: 0, side: 'above' },
-      water: { height: 60, length: 0, side: 'above' },
-      radiator: { height: 20, length: 100, side: 'above' },
+      socket: { height: 30, length: 0, depth: 0, side: 'above' },
+      water: { height: 60, length: 0, depth: 0, side: 'above' },
+      radiator: { height: 20, length: 100, depth: 0, side: 'above' },
+      shaft: { height: 0, length: 60, depth: 40, side: 'above' },
     },
   }
 }
@@ -55,7 +61,19 @@ function restore(): PlannerDefaults {
     if (!raw) return fallback
     const stored = JSON.parse(raw) as Partial<PlannerDefaults>
     return {
-      wall: { ...fallback.wall, ...stored.wall },
+      wall: {
+        ...fallback.wall,
+        ...stored.wall,
+        // Older versions stored `above`, `below` or `none` here.
+        totalDimension: parseDimensionOffset(
+          stored.wall?.totalDimension,
+          fallback.wall.totalDimension,
+        ),
+        detailDimension: parseDimensionOffset(
+          stored.wall?.detailDimension,
+          fallback.wall.detailDimension,
+        ),
+      },
       opening: {
         door: { ...fallback.opening.door, ...stored.opening?.door },
         window: { ...fallback.opening.window, ...stored.opening?.window },
@@ -65,6 +83,7 @@ function restore(): PlannerDefaults {
         socket: { ...fallback.installation.socket, ...stored.installation?.socket },
         water: { ...fallback.installation.water, ...stored.installation?.water },
         radiator: { ...fallback.installation.radiator, ...stored.installation?.radiator },
+        shaft: { ...fallback.installation.shaft, ...stored.installation?.shaft },
       },
     }
   } catch {
