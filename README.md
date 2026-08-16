@@ -25,7 +25,13 @@ Erweiterungspunkte — steht in [DOCUMENTATION.md](DOCUMENTATION.md).
 | `Entf` | Auswahl löschen |
 | `Esc` | Werkzeug abbrechen |
 | Mausrad | Zoom an der Cursorposition |
-| Mittlere Maustaste oder `Leertaste` + Ziehen | Zeichenfläche verschieben |
+| Ziehen mit der Maus | Zeichenfläche verschieben |
+
+Ziehen verschiebt die Zeichenfläche unabhängig vom Werkzeug — es gibt weder
+Auswahlrechtecke noch das Verschieben von Wänden mit der Maus. Was ein
+Mausdruck bedeutet, entscheidet sich deshalb erst beim Loslassen: ohne Bewegung
+ist es ein Klick auf das, was unter dem Cursor lag, mit Bewegung war es ein
+Verschieben. Die mittlere Maustaste verschiebt ebenfalls.
 
 Beim Zeichnen rastet der Cursor an Wandendpunkten und am 50-cm-Raster ein. Die
 Ecke links oben zwischen den Linealen lässt sich auf einen Punkt im Plan ziehen

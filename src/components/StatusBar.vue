@@ -33,7 +33,7 @@ const zoom = computed(() => `${Math.round(viewport.state.scale * 100)} %`)
     <span class="status-item">Zoom: {{ zoom }}</span>
     <span class="status-item">Wände: {{ store.state.plan.walls.length }}</span>
     <span class="status-hint">
-      Mausrad zoomt, Leertaste oder mittlere Maustaste verschiebt, Pfeiltasten scrollen
+      Mausrad zoomt, Ziehen verschiebt, Pfeiltasten scrollen
     </span>
   </footer>
 </template>

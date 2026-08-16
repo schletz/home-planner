@@ -15,6 +15,11 @@ import { PLAN_STYLE } from '@/utils/planStyle'
  * interaction: it snaps the cursor, decides whether a click hits a wall, an
  * object or empty space, and reports insert requests to the application, which
  * then opens the matching dialog.
+ *
+ * Dragging always pans the view, so nothing on the plan can be moved with the
+ * mouse and no rubber band is drawn. What a press means is therefore only
+ * decided when the button is released: without movement it is a click on
+ * whatever was under the pointer, with movement it was a pan.
  */
 const emit = defineEmits<{
   (event: 'place-wall', point: Point): void
@@ -32,11 +37,18 @@ const planGroup = shallowRef<SVGGElement | null>(null)
 
 const rulerSize = `${RULER_SIZE}px`
 
+/** Movement in pixels up to which a drag still counts as a click. */
+const CLICK_TOLERANCE = 3
+
+/** What the pointer went down on, `null` for empty space. */
+type Pick = { wallId: string; objectId?: string }
+
 /** Snapped cursor position, used for the crosshair and for inserting. */
 const cursor = ref<{ screen: Point; model: Point; kind: SnapKind } | null>(null)
-const panning = ref(false)
+const press = ref<{ x: number; y: number; moved: boolean; pick: Pick | null } | null>(null)
 const draggingOrigin = ref(false)
-const spacePressed = ref(false)
+
+const panning = computed(() => press.value?.moved === true)
 
 const isDrawingTool = computed(() => store.state.tool !== 'select')
 
@@ -71,29 +83,11 @@ onMounted(() => {
     style.textContent = PLAN_STYLE
     svg.value.insertBefore(style, svg.value.firstChild)
   }
-  window.addEventListener('keydown', onKeyDown)
-  window.addEventListener('keyup', onKeyUp)
 })
 
 onBeforeUnmount(() => {
   observer?.disconnect()
-  window.removeEventListener('keydown', onKeyDown)
-  window.removeEventListener('keyup', onKeyUp)
 })
-
-function isTextInput(target: EventTarget | null): boolean {
-  const element = target as HTMLElement | null
-  const tag = element?.tagName
-  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
-}
-
-function onKeyDown(event: KeyboardEvent): void {
-  if (event.code === 'Space' && !isTextInput(event.target)) spacePressed.value = true
-}
-
-function onKeyUp(event: KeyboardEvent): void {
-  if (event.code === 'Space') spacePressed.value = false
-}
 
 /** Pointer position relative to the top left corner of the drawing area. */
 function screenPoint(event: PointerEvent | WheelEvent): Point {
@@ -111,8 +105,12 @@ function updateCursor(event: PointerEvent): void {
 }
 
 function onPointerMove(event: PointerEvent): void {
-  if (panning.value) {
-    viewport.panBy(event.movementX, event.movementY)
+  const active = press.value
+  if (active) {
+    if (!active.moved && Math.hypot(event.clientX - active.x, event.clientY - active.y) > CLICK_TOLERANCE) {
+      active.moved = true
+    }
+    if (active.moved) viewport.panBy(event.movementX, event.movementY)
   }
   updateCursor(event)
 }
@@ -123,34 +121,41 @@ function onPointerLeave(): void {
 }
 
 function onPointerDown(event: PointerEvent): void {
-  // Middle button and space + drag pan the view like in every graphics program.
-  if (event.button === 1 || (event.button === 0 && spacePressed.value)) {
-    event.preventDefault()
-    panning.value = true
-    ;(event.target as Element).setPointerCapture?.(event.pointerId)
-    return
-  }
-  if (event.button !== 0) return
+  if (event.button !== 0 && event.button !== 1) return
+  // A drawing tool may open a dialog on release; suppressing the compatibility
+  // mouse events keeps the focus off the canvas, so the dialog can take it. The
+  // middle button is suppressed because of the autoscroll. The select tool must
+  // keep them: a palette field being edited has to lose the focus, otherwise it
+  // never fires `change` and never closes its undo step.
+  if (isDrawingTool.value || event.button === 1) event.preventDefault()
 
-  updateCursor(event)
-  if (store.state.tool === 'wall') {
-    // Suppressing the compatibility mouse events keeps the focus in the dialog
-    // that is about to open.
-    event.preventDefault()
-    emit('place-wall', cursor.value!.model)
-    return
+  const pick = pendingPick
+  pendingPick = null
+  press.value = {
+    x: event.clientX,
+    y: event.clientY,
+    // The middle button pans from the first pixel, the left one only once it moves.
+    moved: event.button === 1,
+    pick: event.button === 0 ? pick : null,
   }
-  if (store.state.tool === 'select') store.select(null)
+  // Capturing on the surface keeps the moves coming when the pointer leaves it.
+  surface.value?.setPointerCapture(event.pointerId)
+  updateCursor(event)
 }
 
 function onPointerUp(event: PointerEvent): void {
-  panning.value = false
   if (draggingOrigin.value) {
     const screen = screenPoint(event)
     const snapped = snapPoint(viewport.toModel(screen.x, screen.y))
     store.setOrigin(snapped.point)
     draggingOrigin.value = false
   }
+
+  const active = press.value
+  press.value = null
+  if (!active || active.moved || event.button !== 0) return
+  updateCursor(event)
+  applyPick(active.pick, event)
 }
 
 function onWheel(event: WheelEvent): void {
@@ -159,39 +164,49 @@ function onWheel(event: WheelEvent): void {
   viewport.zoomAt(event.deltaY < 0 ? 1.12 : 1 / 1.12, screen.x, screen.y)
 }
 
-/** A wall was hit: either select it or insert the object of the active tool. */
-function onPickWall(event: PointerEvent, wallId: string): void {
-  if (event.button !== 0 || spacePressed.value) return
-  event.stopPropagation()
-  updateCursor(event)
+/**
+ * Walls and objects only note that they were hit; the event keeps bubbling to
+ * the surface, which needs it to start a possible pan. Because the press may
+ * still turn into one, nothing is acted on before the release.
+ */
+let pendingPick: Pick | null = null
 
+function onPickWall(event: PointerEvent, wallId: string): void {
+  if (event.button === 0) pendingPick = { wallId }
+}
+
+function onPickObject(event: PointerEvent, wallId: string, objectId: string): void {
+  if (event.button === 0) pendingPick = { wallId, objectId }
+}
+
+/** The button was released without dragging, so this press was a click. */
+function applyPick(pick: Pick | null, event: PointerEvent): void {
+  if (!pick) {
+    if (store.state.tool === 'wall') emit('place-wall', cursor.value!.model)
+    else if (store.state.tool === 'select') store.select(null)
+    return
+  }
+  // Only the select tool tells an object from the wall it sits in; every other
+  // tool inserts into the wall, wherever inside it the click landed.
+  if (pick.objectId && store.state.tool === 'select') {
+    store.select({ wallId: pick.wallId, objectId: pick.objectId })
+    return
+  }
   if (store.state.tool === 'select') {
-    store.select({ wallId })
+    store.select({ wallId: pick.wallId })
     return
   }
   if (store.state.tool === 'wall') {
-    event.preventDefault()
     emit('place-wall', cursor.value!.model)
     return
   }
 
-  const wall = store.findWall(wallId)
+  const wall = store.findWall(pick.wallId)
   if (!wall) return
   // Insert tools measure the click position along the wall.
-  event.preventDefault()
   const screen = screenPoint(event)
   const local = worldToLocal(wall, viewport.toModel(screen.x, screen.y))
-  emit('place-object', wallId, Math.round(Math.min(Math.max(local.x, 0), wall.length)))
-}
-
-function onPickObject(event: PointerEvent, wallId: string, objectId: string): void {
-  if (event.button !== 0 || spacePressed.value) return
-  if (store.state.tool !== 'select') {
-    onPickWall(event, wallId)
-    return
-  }
-  event.stopPropagation()
-  store.select({ wallId, objectId })
+  emit('place-object', pick.wallId, Math.round(Math.min(Math.max(local.x, 0), wall.length)))
 }
 
 /* -------------------------------------------------------------------------- */
@@ -255,7 +270,7 @@ defineExpose({
     <div
       ref="surface"
       class="canvas-surface"
-      :class="{ 'is-drawing': isDrawingTool, 'is-panning': panning || spacePressed }"
+      :class="{ 'is-drawing': isDrawingTool, 'is-panning': panning }"
       @pointermove="onPointerMove"
       @pointerdown="onPointerDown"
       @pointerup="onPointerUp"
@@ -340,12 +355,15 @@ defineExpose({
   position: relative;
   overflow: hidden;
   touch-action: none;
+  /* Dragging pans, so it must never select the labels of the drawing. */
+  user-select: none;
 }
 .canvas-surface.is-drawing {
   cursor: crosshair;
 }
+/* Only while actually dragging — the idle cursor still belongs to the tool. */
 .canvas-surface.is-panning {
-  cursor: grab;
+  cursor: grabbing;
 }
 .canvas-svg {
   position: absolute;

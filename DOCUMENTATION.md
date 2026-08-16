@@ -22,7 +22,7 @@ Zeilenzahlen inklusive `<template>` und `<style>` der SFCs.
 | Datei | Zeilen | Verantwortung |
 | --- | --- | --- |
 | [src/App.vue](src/App.vue) | 175 | Schale; verbindet Klick auf der Zeichenfläche mit dem passenden Dialog, Dateikommandos, Einpassen |
-| [src/components/canvas/PlanCanvas.vue](src/components/canvas/PlanCanvas.vue) | 375 | Zeichenfläche: Layout mit Linealen, gesamte Zeigerinteraktion, Nullpunkt-Ziehen, Injektion von `PLAN_STYLE` |
+| [src/components/canvas/PlanCanvas.vue](src/components/canvas/PlanCanvas.vue) | 393 | Zeichenfläche: Layout mit Linealen, gesamte Zeigerinteraktion, Nullpunkt-Ziehen, Injektion von `PLAN_STYLE` |
 | [src/components/canvas/CanvasGrid.vue](src/components/canvas/CanvasGrid.vue) | 73 | 10/50-cm-Raster und Achsenkreuz als je ein `<path>` |
 | [src/components/canvas/CanvasRuler.vue](src/components/canvas/CanvasRuler.vue) | 130 | Lineal waagrecht/senkrecht, Beschriftungsraster abhängig vom Zoom |
 | [src/components/plan/PlanView.vue](src/components/plan/PlanView.vue) | 70 | Wurzelgruppe der Zeichnung; genau dieses Element wird exportiert; Reihenfolge der drei Zeichendurchgänge |
@@ -140,18 +140,26 @@ verdrehte Pläne, ohne dass etwas abstürzt:
 ### Objekt einfügen
 
 ```
-pointerdown auf der Zeichenfläche
- ├─ [Treffer auf Wand]  WallShape emittiert pick-wall     WallShape.vue:55
- │    └─ onPickWall(event, wallId)                        PlanCanvas.vue:163
- │         ├─ [Werkzeug select]   store.select({wallId})
- │         ├─ [Werkzeug wall]     emit place-wall
- │         └─ [Einfügewerkzeug]   worldToLocal → offset (auf ganze cm gerundet)
- │                                emit place-object(wallId, offset)
- ├─ [Treffer auf Objekt] onPickObject(...)                PlanCanvas.vue:187
- │    └─ [Werkzeug ≠ select] delegiert an onPickWall
- └─ [kein Treffer]      onPointerDown                     PlanCanvas.vue:125
-      ├─ [Werkzeug wall] snapPoint → emit place-wall
-      └─ [Werkzeug select] store.select(null)
+pointerdown
+ ├─ [Treffer auf Wand]   WallShape emittiert pick-wall    WallShape.vue:50
+ │    └─ onPickWall  → pendingPick = {wallId}             PlanCanvas.vue:174
+ ├─ [Treffer auf Objekt] onPickObject                     PlanCanvas.vue:178
+ │    └─ pendingPick = {wallId, objectId}
+ └─ das Ereignis blubbert weiter zur Fläche
+      onPointerDown  press = {x, y, moved, pick}          PlanCanvas.vue:123
+
+pointermove
+ └─ [press gesetzt] ab CLICK_TOLERANCE moved = true → viewport.panBy
+
+pointerup
+ ├─ [moved]   nichts, es war ein Verschieben
+ └─ [!moved]  applyPick(press.pick)                       PlanCanvas.vue:183
+      ├─ [Objekt + Werkzeug select]  store.select({wallId, objectId})
+      ├─ [Wand + Werkzeug select]    store.select({wallId})
+      ├─ [Werkzeug wall]             emit place-wall (gefangener Punkt)
+      ├─ [Einfügewerkzeug + Wand]    worldToLocal → offset (ganze cm)
+      │                              emit place-object(wallId, offset)
+      └─ [kein Treffer, select]      store.select(null)
 
 App.vue setzt pendingWallStart bzw. pendingObject             App.vue:42/46
  └─ v-if wählt den Dialog nach dem aktiven Werkzeug            App.vue:127-155
@@ -160,25 +168,47 @@ App.vue setzt pendingWallStart bzw. pendingObject             App.vue:42/46
 
 Reihenfolgeabhängigkeiten:
 
-1. `updateCursor` [PlanCanvas.vue:105](src/components/canvas/PlanCanvas.vue#L105)
+1. Kein Treffer darf `stopPropagation` aufrufen. Wände und Objekte merken sich
+   den Treffer nur in `pendingPick` und lassen das Ereignis weiterlaufen, denn
+   die Fläche braucht dasselbe `pointerdown`, um ein mögliches Verschieben zu
+   beginnen. `onPointerDown` liest `pendingPick` und löscht es sofort; das ist
+   sicher, weil das Ereignis die Fläche als letztes erreicht.
+2. `updateCursor` [PlanCanvas.vue:117](src/components/canvas/PlanCanvas.vue#L117)
    muss vor jedem `emit('place-wall')` laufen, denn der Wandstartpunkt wird aus
-   `cursor.value.model` gelesen, also aus dem **gefangenen** Punkt.
-2. Welcher Dialog erscheint, hängt am aktiven Werkzeug, nicht am ausgelösten
+   `cursor.value.model` gelesen, also aus dem **gefangenen** Punkt. `onPointerUp`
+   ruft es deshalb selbst auf, bevor es `applyPick` betritt.
+3. Welcher Dialog erscheint, hängt am aktiven Werkzeug, nicht am ausgelösten
    Ereignis. Ein Werkzeugwechsel bei offenem Dialog würde den Dialogtyp
    umschalten — genau deshalb sperrt `useShortcuts` alle Tasten, solange ein
    Dialog offen ist ([useShortcuts.ts:36](src/composables/useShortcuts.ts#L36)).
-3. `event.preventDefault()` in den beiden Zweigen, die einen Dialog öffnen
-   ([PlanCanvas.vue:139](src/components/canvas/PlanCanvas.vue#L139) und
-   [PlanCanvas.vue:181](src/components/canvas/PlanCanvas.vue#L181)), unterdrückt
-   die Kompatibilitäts-Mausereignisse. Ohne das zieht der nachfolgende
-   `mousedown` den Fokus aus dem gerade fokussierten Dialogfeld zurück auf den
-   Body, und die Eingabe landet nirgends.
+4. `event.preventDefault()` im `pointerdown`
+   ([PlanCanvas.vue:129](src/components/canvas/PlanCanvas.vue#L129)) unterdrückt
+   die Kompatibilitäts-Mausereignisse, aber **nur bei einem Zeichenwerkzeug**.
+   Ohne das zieht der nachfolgende `mousedown` den Fokus aus dem gerade
+   geöffneten Dialogfeld zurück auf den Body, und die Eingabe landet nirgends.
+   Beim Auswahlwerkzeug muss das Unterdrücken unterbleiben, sonst behält ein
+   gerade bearbeitetes Feld der Palette den Fokus, meldet kein `change` und
+   schließt damit seinen Undo-Schritt nie.
+
+**Verschieben.** Jedes Ziehen verschiebt die Ansicht, unabhängig vom Werkzeug
+und unabhängig davon, worauf der Zeiger aufgesetzt hat. Das ist nur deshalb
+konfliktfrei, weil sich nichts im Plan mit der Maus bewegen lässt und kein
+Auswahlrechteck gezogen wird — die einzige Ausnahme ist der Nullpunktgriff, der
+seine eigenen Zeigerereignisse hat. Die mittlere Maustaste verschiebt ab dem
+ersten Pixel, die linke erst ab `CLICK_TOLERANCE`.
+
+Die Fläche fängt den Zeiger im `pointerdown` mit `setPointerCapture` ein
+([PlanCanvas.vue:142](src/components/canvas/PlanCanvas.vue#L142)). Nur deshalb
+laufen Bewegung und Loslassen weiter, wenn der Zeiger dabei über das Lineal oder
+aus dem Fenster wandert; ohne den Fang bliebe `press` gesetzt und die nächste
+Bewegung würde ungefragt verschieben. Verschoben wird über `movementX/Y`, nicht
+über die Differenz zum Startpunkt, damit der Zoom zwischendurch nichts stört.
 
 ### Zeichnen und Export
 
 ```
-PlanCanvas <svg>                                    PlanCanvas.vue:266
- ├─ <style> mit PLAN_STYLE, per Skript eingefügt     PlanCanvas.vue:60-73
+PlanCanvas <svg>                                    PlanCanvas.vue:281
+ ├─ <style> mit PLAN_STYLE, per Skript eingefügt     PlanCanvas.vue:79-85
  ├─ <g transform="translate(pan) scale(scale)">
  │    ├─ CanvasGrid (pointer-events: none)
  │    └─ <g ref="planGroup">        ← einziges Exportobjekt
@@ -190,7 +220,7 @@ PlanCanvas <svg>                                    PlanCanvas.vue:266
  │                   ├─ OpeningShape / InstallationShape je Objekt
  │                   │    └─ ShaftDimensions nur beim Schacht
  │                   └─ DimensionRow für Detail- und Gesamtbemaßung
- └─ canvas-crosshair (pointer-events: none)          PlanCanvas.vue:280
+ └─ canvas-crosshair (pointer-events: none)          PlanCanvas.vue:295
 
 exportSvg()                                         App.vue:81
  └─ buildSvgDocument(planGroup)                      svgExport.ts:39
@@ -266,7 +296,7 @@ liefert das Singleton mit der in
 
 `PlanCanvas` emittiert `place-wall(point)`, `place-object(wallId, offset)` und
 `cursor(point | null)` und exponiert `planElement()`
-([PlanCanvas.vue:217](src/components/canvas/PlanCanvas.vue#L217)) als einzigen
+([PlanCanvas.vue:232](src/components/canvas/PlanCanvas.vue#L232)) als einzigen
 Zugriff auf die Zeichnungsgruppe.
 
 ### Persistenz
@@ -320,7 +350,7 @@ das wird nicht geprüft.
 `PLAN_STYLE` [planStyle.ts:50](src/utils/planStyle.ts#L50) definiert `--plan-line`
 (1) und `--plan-hairline` (0,7) auf dem `svg`-Element. Die Zeichenfläche
 überschreibt beide inline aus dem Zoom
-([PlanCanvas.vue:47](src/components/canvas/PlanCanvas.vue#L47)):
+([PlanCanvas.vue:59](src/components/canvas/PlanCanvas.vue#L59)):
 `max(1, 1.2 px)` bzw. `max(0.7, 1 px)` in Zentimetern, damit Haarlinien am
 Bildschirm nie unter ein Pixel fallen. Der Export übernimmt die Variablen nicht,
 weil nur die Gruppe geklont wird — die Datei bekommt dadurch feste Strichstärken.
@@ -355,7 +385,7 @@ Wandbemaßung, ist deren Abstand an der Wand zu erhöhen.
 | `fitTo(..., padding)` | [78](src/composables/useViewport.ts#L78) | 80 | Rand in Pixel beim Einpassen |
 
 Das Mausrad zoomt mit dem abweichenden Faktor 1,12
-([PlanCanvas.vue:159](src/components/canvas/PlanCanvas.vue#L159)), damit sich
+([PlanCanvas.vue:164](src/components/canvas/PlanCanvas.vue#L164)), damit sich
 Rasten des Rads feiner anfühlen als Tastendrücke.
 
 ### Einrasten, Raster, Lineal
@@ -372,7 +402,8 @@ Rasten des Rads feiner anfühlen als Tastendrücke.
 | `HISTORY_LIMIT = 100` | [usePlanStore.ts:16](src/composables/usePlanStore.ts#L16) | Schnappschüsse, ältester fällt heraus |
 | `SNAP_DECIMALS = 1` | [useSnapping.ts:20](src/composables/useSnapping.ts#L20) | Nachkommastellen eines gefangenen Punktes |
 | `JUNCTION_TOLERANCE = 0.5` | [wallGeometry.ts:20](src/utils/wallGeometry.ts#L20) | ab wann ein Wandende auf einer anderen Wand liegt |
-| Klickbreite dünner Wände | [PlanCanvas.vue:44](src/components/canvas/PlanCanvas.vue#L44) | 14 px, in Zentimeter umgerechnet |
+| Klickbreite dünner Wände | [PlanCanvas.vue:56](src/components/canvas/PlanCanvas.vue#L56) | 14 px, in Zentimeter umgerechnet |
+| `CLICK_TOLERANCE = 3` | [PlanCanvas.vue:41](src/components/canvas/PlanCanvas.vue#L41) | Pixel, bis zu denen ein Ziehen noch als Klick gilt |
 
 Die Fangreihenfolge ist fest: erst der nächste Wandendpunkt über alle Wände, nur
 wenn keiner im Radius liegt der nächste Rasterpunkt, sonst der auf ganze
@@ -612,9 +643,11 @@ absenden und den Dialog doppelt bestätigen
 ([BaseDialog.vue:30](src/components/dialogs/BaseDialog.vue#L30)).
 
 **Wände mit der Maus verschiebbar machen.** Nicht vorgesehen und gegen die
-Grundidee; falls doch, ist der Angriffspunkt `onPointerMove`
-[PlanCanvas.vue:113](src/components/canvas/PlanCanvas.vue#L113) plus ein
-Zugstatus analog zu `draggingOrigin`. Objekte müssen dabei unangetastet bleiben,
+Grundidee. Wer es doch tut, nimmt dem Verschieben der Ansicht seine Geste: die
+Fläche verschiebt bei jedem Ziehen, ohne zu fragen, worauf aufgesetzt wurde. Es
+bräuchte also zuerst eine Entscheidung im `pointerdown` — etwa nur bei
+ausgewählter Wand und nur mit dem Auswahlwerkzeug ziehen —, danach einen
+Zugstatus in `press` neben `moved`. Objekte müssen dabei unangetastet bleiben,
 sie hängen über `offset` an der Wand.
 
 **Mehrfachauswahl.** `Selection` [types/plan.ts:124](src/types/plan.ts#L124) ist
