@@ -11,9 +11,6 @@ import { gapBefore, startForGap } from '@/utils/objectSpacing'
  * of it — so editing either one recalculates the other. On site only the second
  * measure is usually available: the tape runs from window to window, not back
  * to the corner every time.
- *
- * Both fields take arithmetic, because a position read from a sketch is often a
- * sum of two measurements rather than a single number.
  */
 const props = withDefaults(
   defineProps<{
@@ -51,14 +48,12 @@ function setGap(value: number): void {
     :model-value="offset"
     label="Abstand zum Wandanfang"
     :min="0"
-    expression
     @update:model-value="emit('update:offset', $event)"
     @commit="emit('commit')"
   />
   <NumberField
     :model-value="gap"
     label="Abstand zum vorigen Objekt"
-    expression
     @update:model-value="setGap"
     @commit="emit('commit')"
   />

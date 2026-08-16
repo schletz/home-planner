@@ -107,12 +107,7 @@ zwischen den beiden steht. Beide Felder beschreiben dieselbe Lage; wer das eine
 ändert, bekommt das andere neu gerechnet. Gibt es kein voriges Objekt, wird ab
 Wandanfang gemessen. Objekte ohne Bemaßung werden dabei übersprungen.
 
-Beide Felder nehmen auch Rechnungen an: `214+7`, `142/2+1` oder `(80+120)/2`
-sind gültige Eingaben. Erlaubt sind `+`, `-`, `*`, `/` und Klammern, Punkt vor
-Strich; Dezimaltrennzeichen ist der Punkt. Beim Verlassen des Feldes steht dort
-das Ergebnis.
-
-In allen übrigen Zahlenfeldern ändern die Pfeiltasten den Wert um 0,5 cm, in den
+In allen Zahlenfeldern ändern die Pfeiltasten den Wert um 0,5 cm, in den
 vier Bemaßungsfeldern einer Wand um 2,5 cm und beim Winkel um 5°. Die halben
 Schritte gibt es, weil Wandstärken oft ungerade sind und die halbe Wandstärke
 damit direkt erreichbar bleibt.

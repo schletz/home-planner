@@ -45,8 +45,8 @@ Zeilenzahlen inklusive `<template>` und `<style>` der SFCs.
 | [src/components/dialogs/OpeningDialog.vue](src/components/dialogs/OpeningDialog.vue) | 107 | Dialog für eine neue Öffnung |
 | [src/components/dialogs/InstallationDialog.vue](src/components/dialogs/InstallationDialog.vue) | 113 | Dialog für eine neue Installation |
 | [src/components/dialogs/AnglePreview.vue](src/components/dialogs/AnglePreview.vue) | 115 | Winkelvorschau mit Pfeil, auch in der Palette verwendet |
-| [src/components/form/NumberField.vue](src/components/form/NumberField.vue) | 129 | Zahlenfeld mit Einheit, `commit` beim Verlassen, optional mit Rechenausdruck |
-| [src/components/form/ObjectOffsetFields.vue](src/components/form/ObjectOffsetFields.vue) | 65 | Die zwei gekoppelten Abstandsfelder eines Wandobjekts |
+| [src/components/form/NumberField.vue](src/components/form/NumberField.vue) | 121 | Zahlenfeld mit Einheit, `commit` beim Verlassen |
+| [src/components/form/ObjectOffsetFields.vue](src/components/form/ObjectOffsetFields.vue) | 60 | Die zwei gekoppelten Abstandsfelder eines Wandobjekts |
 | [src/components/form/TextField.vue](src/components/form/TextField.vue) | 50 | Textfeld |
 | [src/components/form/CheckField.vue](src/components/form/CheckField.vue) | 62 | Kontrollkästchen mit Erklärzeile, meldet `commit` sofort |
 | [src/components/form/OptionGroup.vue](src/components/form/OptionGroup.vue) | 99 | Radiogruppe als Segmentschalter, generisch über `T extends string` |
@@ -63,7 +63,6 @@ Zeilenzahlen inklusive `<template>` und `<style>` der SFCs.
 | [src/utils/wallGeometry.ts](src/utils/wallGeometry.ts) | 117 | Eckenüberstand, Öffnungsintervalle, Wandsegmente, Bogenpfad |
 | [src/utils/objectSpacing.ts](src/utils/objectSpacing.ts) | 84 | Ausdehnung eines Objekts und Abstand zum vorigen Objekt |
 | [src/utils/dimensions.ts](src/utils/dimensions.ts) | 77 | Maßketten |
-| [src/utils/expression.ts](src/utils/expression.ts) | 127 | Rechenausdrücke in Eingabefeldern |
 | [src/utils/planStyle.ts](src/utils/planStyle.ts) | 176 | Maße und CSS der Zeichnung |
 | [src/utils/storage.ts](src/utils/storage.ts) | 198 | Parsen, Local Storage, Datei-Download und -Auswahl |
 | [src/utils/svgExport.ts](src/utils/svgExport.ts) | 64 | Aufbau des SVG-Dokuments |
@@ -230,7 +229,7 @@ Reihenfolgeabhängigkeiten:
 Plan als JSON-Schnappschuss ab und wird von jeder strukturellen Aktion am Ende
 selbst aufgerufen. Feldweise Bearbeitung in der Palette schreibt dagegen direkt
 in den Store und meldet `commit` erst im `change`-Ereignis des Feldes, also beim
-Verlassen oder bei Enter ([NumberField.vue:60](src/components/form/NumberField.vue#L60)).
+Verlassen oder bei Enter ([NumberField.vue:52](src/components/form/NumberField.vue#L52)).
 
 Daraus folgt: zwischen zwei Commits liegt beliebig viel Tipparbeit, und
 `undo()` ruft deshalb zuerst selbst `commit()` auf
@@ -506,20 +505,14 @@ nicht in Frage, sonst zeigte das Feld eine Zahl, die im Plan nirgends steht.
 Felder zusammen; `leading` gibt an, wie weit das Objekt vor seinem `offset`
 beginnt (halbe Länge beim Heizkörper, 0 bei Öffnungen und beim Schacht).
 
-**Rechenausdrücke.** Beide Abstandsfelder setzen `expression` an
-[NumberField](src/components/form/NumberField.vue) und lassen damit Eingaben wie
-`142/2+1` zu, ausgewertet von
-[evaluateExpression](src/utils/expression.ts) mit Punkt-vor-Strich, Klammern und
-Vorzeichen. Ein solches Feld ist ein `input type="text"`, hat also keine
-Pfeiltasten-Schrittweite mehr. Alle übrigen Zahlenfelder gehen mit den
-Pfeiltasten in 0,5-cm-Schritten
-([NumberField.vue:30](src/components/form/NumberField.vue#L30)); die vier
+**Schrittweiten.** Jedes Zahlenfeld ist ein `input type="number"` und geht mit
+den Pfeiltasten in 0,5-cm-Schritten
+([NumberField.vue:23](src/components/form/NumberField.vue#L23)); die vier
 Bemaßungsfelder einer Wand setzen 2,5 dagegen. Beide Werte sind die Hälfte
 eines ganzen Zentimeters bzw. von fünf, weil Wandstärken oft ungerade sind und
 die halbe Wandstärke damit erreichbar bleibt. Der Winkel behält seine 5°.
-Während des Tippens meldet es jeden auswertbaren
-Zwischenstand, beim Verlassen ersetzt es den Ausdruck durch sein Ergebnis; ist
-er unvollständig, bleibt der letzte gültige Wert stehen.
+Während des Tippens meldet das Feld jeden lesbaren Zwischenstand; beim Verlassen
+bleibt bei unlesbarer Eingabe der letzte gültige Wert stehen.
 
 **Auswahl.** Die Hervorhebung ist reines CSS über die Klasse `is-selected`
 ([planStyle.ts:67](src/utils/planStyle.ts#L67) und
@@ -537,7 +530,7 @@ allen geklonten Elementen.
 | Export bei leerem Plan | `window.alert`, kein Download | [App.vue:84](src/App.vue#L84) |
 | Neuer Plan bei vorhandenen Wänden | `window.confirm`, Abbruch möglich | [App.vue:66](src/App.vue#L66) |
 | Auswahl zeigt nach Undo auf gelöschtes Objekt | `validateSelection` fällt auf die Wand oder auf `null` zurück | [usePlanStore.ts:61](src/composables/usePlanStore.ts#L61) |
-| Unlesbare Zahl oder unvollständiger Rechenausdruck im Eingabefeld | beim Verlassen auf den letzten gültigen Wert zurückgesetzt | [NumberField.vue:60](src/components/form/NumberField.vue#L60) |
+| Unlesbare Zahl im Eingabefeld | beim Verlassen auf den letzten gültigen Wert zurückgesetzt | [NumberField.vue:52](src/components/form/NumberField.vue#L52) |
 | Objekt ragt über das Wandende hinaus | Darstellung und Bemaßung klemmen den Wert, die Daten bleiben unverändert | [wallGeometry.ts:51](src/utils/wallGeometry.ts#L51) |
 | Plan mit `above`/`below`/`none` als Bemaßungsangabe | wird beim Laden in den vorzeichenbehafteten Abstand umgerechnet | [storage.ts:44](src/utils/storage.ts#L44) |
 | Objekt ohne `includeInDimension`, Wand ohne Bemaßungsränder | gelten als bemaßt bzw. als Rand 0, alte Dateien bleiben damit lesbar | [storage.ts:52](src/utils/storage.ts#L52) |

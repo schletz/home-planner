@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { evaluateExpression } from '@/utils/expression'
 
 /**
  * Number input with unit. Values are edited by typing, the arrow keys step by
  * `step`. `commit` fires when the field is left or Enter is pressed, which the
  * palette uses to close an undo step.
- *
- * With `expression` the field also takes a calculation such as `142/2+1` and
- * shows its result once the field is left. Such a field is a text input, so it
- * has no spin buttons and no arrow key stepping.
  */
 const props = withDefaults(
   defineProps<{
@@ -24,10 +19,8 @@ const props = withDefaults(
      * has to hit.
      */
     step?: number
-    /** Accept arithmetic instead of a plain number, see {@link evaluateExpression}. */
-    expression?: boolean
   }>(),
-  { unit: 'cm', min: undefined, max: undefined, step: 0.5, expression: false },
+  { unit: 'cm', min: undefined, max: undefined, step: 0.5 },
 )
 
 const emit = defineEmits<{
@@ -46,7 +39,6 @@ watch(
 )
 
 function parse(raw: string): number {
-  if (props.expression) return evaluateExpression(raw) ?? Number.NaN
   return Number.parseFloat(raw.replace(',', '.'))
 }
 
@@ -73,7 +65,7 @@ defineExpose({ focus: () => input.value?.select() })
       <input
         ref="input"
         :value="text"
-        :type="expression ? 'text' : 'number'"
+        type="number"
         inputmode="decimal"
         :min="min"
         :max="max"
