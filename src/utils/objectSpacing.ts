@@ -26,10 +26,16 @@ const EPSILON = 0.05
  * Extent an object covers along the wall. Objects without a length — a socket
  * or a water connection — are measured to their centre, so start and end fall
  * together.
+ *
+ * A shaft is anchored like an opening, at the edge facing the wall start; the
+ * radiator remains the one object that hangs symmetrically around its offset.
  */
 export function objectExtent(object: WallObject): Extent {
   if (isOpening(object)) {
     return { start: object.offset, end: object.offset + object.width }
+  }
+  if (object.kind === 'shaft') {
+    return { start: object.offset, end: object.offset + (object.length ?? 0) }
   }
   if (object.length) {
     const half = object.length / 2

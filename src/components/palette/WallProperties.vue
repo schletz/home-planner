@@ -61,14 +61,14 @@ function set(patch: Partial<Omit<Wall, 'id' | 'objects'>>): void {
       <NumberField
         :model-value="wall.totalDimension"
         label="Gesamtbemaßung"
-        :step="5"
+        :step="2.5"
         @update:model-value="set({ totalDimension: $event })"
         @commit="store.commit()"
       />
       <NumberField
         :model-value="wall.detailDimension"
         label="Detailbemaßung"
-        :step="5"
+        :step="2.5"
         @update:model-value="set({ detailDimension: $event })"
         @commit="store.commit()"
       />
@@ -82,14 +82,14 @@ function set(patch: Partial<Omit<Wall, 'id' | 'objects'>>): void {
       <NumberField
         :model-value="wall.dimensionMarginStart"
         label="Bemaßungsrand links"
-        :step="5"
+        :step="2.5"
         @update:model-value="set({ dimensionMarginStart: $event })"
         @commit="store.commit()"
       />
       <NumberField
         :model-value="wall.dimensionMarginEnd"
         label="Bemaßungsrand rechts"
-        :step="5"
+        :step="2.5"
         @update:model-value="set({ dimensionMarginEnd: $event })"
         @commit="store.commit()"
       />

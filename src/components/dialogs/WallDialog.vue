@@ -85,8 +85,8 @@ function confirm(): void {
     </div>
 
     <div class="grid">
-      <NumberField v-model="draft.totalDimension" label="Gesamtbemaßung" :step="5" />
-      <NumberField v-model="draft.detailDimension" label="Detailbemaßung" :step="5" />
+      <NumberField v-model="draft.totalDimension" label="Gesamtbemaßung" :step="2.5" />
+      <NumberField v-model="draft.detailDimension" label="Detailbemaßung" :step="2.5" />
     </div>
     <p class="hint">
       Abstand der Maßlinie von der Wand. Negativ liegt darüber, positiv darunter, 0 blendet die
@@ -94,8 +94,8 @@ function confirm(): void {
     </p>
 
     <div class="grid">
-      <NumberField v-model="draft.dimensionMarginStart" label="Bemaßungsrand links" :step="5" />
-      <NumberField v-model="draft.dimensionMarginEnd" label="Bemaßungsrand rechts" :step="5" />
+      <NumberField v-model="draft.dimensionMarginStart" label="Bemaßungsrand links" :step="2.5" />
+      <NumberField v-model="draft.dimensionMarginEnd" label="Bemaßungsrand rechts" :step="2.5" />
     </div>
     <p class="hint">
       Rückt die äußeren Maßstriche nach innen, etwa um die halbe Stärke der anschließenden Wand.

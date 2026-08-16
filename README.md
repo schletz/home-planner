@@ -75,7 +75,8 @@ Laufrichtung der Wand.
 (`above`/`below`); beim Doppelfenster zählt nur die Seite. Ein `shaft` ist ein
 Schacht, der mit `length` entlang der Wand und `depth` in den Raum hinein misst;
 er bringt eine eigene Bemaßung für Breite und Tiefe mit, weil seine Tiefe in
-keiner Maßreihe entlang der Wand vorkommen kann.
+keiner Maßreihe entlang der Wand vorkommen kann. Sein `offset` bezeichnet wie
+bei einer Öffnung die zum Wandanfang zeigende Kante.
 
 `totalDimension` und `detailDimension` sind der Abstand der jeweiligen Maßlinie
 von der Wandaußenkante in cm: negativ liegt sie auf der `above`-Seite, positiv
@@ -97,7 +98,9 @@ Eintrag in der Wandbemaßung; seine eigenen Maßpfeile bleiben in jedem Fall.
 
 ### Objekte positionieren
 
-Jedes Objekt speichert nur seinen `offset` ab Wandanfang. In Dialog und Palette
+Jedes Objekt speichert nur seinen `offset` ab Wandanfang. Bei Türe, Fenster,
+Doppelfenster und Schacht ist das die zum Wandanfang zeigende Kante, bei
+Steckdose, Wasseranschluss und Heizkörper die Mitte. In Dialog und Palette
 steht daneben der *Abstand zum vorigen Objekt* — die lichte Weite bis zur
 Hinterkante des Objekts davor, also genau die Zahl, die in der Detailbemaßung
 zwischen den beiden steht. Beide Felder beschreiben dieselbe Lage; wer das eine
@@ -108,6 +111,11 @@ Beide Felder nehmen auch Rechnungen an: `214+7`, `142/2+1` oder `(80+120)/2`
 sind gültige Eingaben. Erlaubt sind `+`, `-`, `*`, `/` und Klammern, Punkt vor
 Strich; Dezimaltrennzeichen ist der Punkt. Beim Verlassen des Feldes steht dort
 das Ergebnis.
+
+In allen übrigen Zahlenfeldern ändern die Pfeiltasten den Wert um 0,5 cm, in den
+vier Bemaßungsfeldern einer Wand um 2,5 cm und beim Winkel um 5°. Die halben
+Schritte gibt es, weil Wandstärken oft ungerade sind und die halbe Wandstärke
+damit direkt erreichbar bleibt.
 
 ## SVG-Export
 

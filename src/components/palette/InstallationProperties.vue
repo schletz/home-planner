@@ -23,9 +23,9 @@ const hasLength = computed(() => props.installation.kind === 'radiator' || isSha
 /** A shaft reaches from floor to ceiling, a mounting height says nothing. */
 const hasHeight = computed(() => !isShaft.value)
 const lengthLabel = computed(() => (isShaft.value ? 'Breite' : 'Länge'))
-/** Objects with an extent are placed by their centre, openings by their edge. */
+/** Only the radiator is placed by its centre, shaft and openings by their edge. */
 const leading = computed(() =>
-  hasLength.value ? (props.installation.length ?? 100) / 2 : 0,
+  props.installation.kind === 'radiator' ? (props.installation.length ?? 100) / 2 : 0,
 )
 const dimensionHint = computed(() =>
   isShaft.value

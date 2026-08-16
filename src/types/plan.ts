@@ -62,7 +62,11 @@ export interface Opening {
 export interface Installation {
   id: string
   kind: InstallationKind
-  /** Distance of the symbol centre from the wall start, in cm. */
+  /**
+   * Distance from the wall start in cm. Symbols and the radiator are placed by
+   * their centre; a shaft is placed by the edge facing the wall start, just
+   * like an opening, because that edge is what a tape measure reaches.
+   */
   offset: number
   /** Mounting height above finished floor in cm. Meaningless for a shaft. */
   height: number

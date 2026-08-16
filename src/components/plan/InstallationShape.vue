@@ -27,7 +27,11 @@ const SHAFT_DEPTH = 40
 
 const sign = computed(() => sideSign(props.installation.side))
 const half = computed(() => props.wall.thickness / 2)
-const centerX = computed(() => clamp(props.installation.offset, 0, props.wall.length))
+/**
+ * Position of the object on the wall. It is the centre of every symbol and of
+ * the radiator; only the shaft grows from here towards the wall end.
+ */
+const anchorX = computed(() => clamp(props.installation.offset, 0, props.wall.length))
 /** y of the wall face the symbol is mounted on. */
 const faceY = computed(() => sign.value * half.value)
 
@@ -35,18 +39,18 @@ const faceY = computed(() => sign.value * half.value)
 const socketPath = computed(() => {
   const r = SYMBOL_RADIUS
   const sweep = sign.value > 0 ? 0 : 1
-  return `M ${centerX.value - r} ${faceY.value} A ${r} ${r} 0 0 ${sweep} ${centerX.value + r} ${faceY.value} Z`
+  return `M ${anchorX.value - r} ${faceY.value} A ${r} ${r} 0 0 ${sweep} ${anchorX.value + r} ${faceY.value} Z`
 })
 
 const waterCenter = computed(() => ({
-  x: centerX.value,
+  x: anchorX.value,
   y: faceY.value + sign.value * (SYMBOL_RADIUS + 4),
 }))
 
 const radiator = computed(() => {
   const length = Math.max(props.installation.length ?? 100, 10)
   return {
-    x: centerX.value - length / 2,
+    x: anchorX.value - length / 2,
     y: sign.value > 0 ? faceY.value : faceY.value - RADIATOR_DEPTH,
     width: length,
     height: RADIATOR_DEPTH,
@@ -59,12 +63,15 @@ const radiator = computed(() => {
  * Only its three free sides carry a contour: the fourth one lies in the wall
  * face and would cut the wall in two. An open path still fills as if it were
  * closed, so a single path yields both the body and the correct outline.
+ *
+ * Its offset names the edge facing the wall start, so the rectangle runs from
+ * there towards the wall end.
  */
 const shaft = computed(() => {
   const width = Math.max(props.installation.length ?? SHAFT_WIDTH, 1)
   const depth = Math.max(props.installation.depth ?? SHAFT_DEPTH, 1)
-  const left = centerX.value - width / 2
-  const right = centerX.value + width / 2
+  const left = anchorX.value
+  const right = left + width
   const outerY = faceY.value + sign.value * depth
   return {
     depth,
@@ -88,8 +95,12 @@ const labelDistance = computed(() => {
   return SYMBOL_RADIUS * 2.6
 })
 
+/** The label is centred over the object, which for a shaft is not its anchor. */
 const labelPoint = computed(() => ({
-  x: centerX.value,
+  x:
+    props.installation.kind === 'shaft'
+      ? (shaft.value.left + shaft.value.right) / 2
+      : anchorX.value,
   y: faceY.value + sign.value * labelDistance.value,
 }))
 
@@ -108,9 +119,9 @@ const flipped = computed(() => isTextFlipped(props.wall))
     <template v-if="installation.kind === 'socket'">
       <line
         class="plan-symbol-line"
-        :x1="centerX"
+        :x1="anchorX"
         :y1="faceY"
-        :x2="centerX"
+        :x2="anchorX"
         :y2="faceY + sign * SYMBOL_RADIUS * 1.9"
       />
       <path class="plan-symbol" :d="socketPath" />
@@ -119,7 +130,7 @@ const flipped = computed(() => isTextFlipped(props.wall))
     <template v-else-if="installation.kind === 'water'">
       <line
         class="plan-symbol-line"
-        :x1="centerX"
+        :x1="anchorX"
         :y1="faceY"
         :x2="waterCenter.x"
         :y2="waterCenter.y"

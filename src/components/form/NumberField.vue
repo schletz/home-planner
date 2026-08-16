@@ -18,11 +18,16 @@ const props = withDefaults(
     unit?: string
     min?: number
     max?: number
+    /**
+     * Arrow key increment. Half a centimetre by default, because wall
+     * thicknesses are often odd numbers and half of them is what a position
+     * has to hit.
+     */
     step?: number
     /** Accept arithmetic instead of a plain number, see {@link evaluateExpression}. */
     expression?: boolean
   }>(),
-  { unit: 'cm', min: undefined, max: undefined, step: 1, expression: false },
+  { unit: 'cm', min: undefined, max: undefined, step: 0.5, expression: false },
 )
 
 const emit = defineEmits<{

@@ -52,8 +52,8 @@ const hasLength = computed(() => props.kind === 'radiator' || isShaft.value)
 /** A shaft reaches from floor to ceiling, a mounting height says nothing. */
 const hasHeight = computed(() => !isShaft.value)
 const lengthLabel = computed(() => (isShaft.value ? 'Breite' : 'Länge'))
-/** Objects with an extent are placed by their centre, openings by their edge. */
-const leading = computed(() => (hasLength.value ? draft.length / 2 : 0))
+/** Only the radiator is placed by its centre, shaft and openings by their edge. */
+const leading = computed(() => (props.kind === 'radiator' ? draft.length / 2 : 0))
 const dimensionHint = computed(() =>
   isShaft.value
     ? 'Der Schacht wird immer selbst bemaßt; die Option steuert nur den Eintrag in der Wandbemaßung.'
